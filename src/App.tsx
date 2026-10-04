@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
 import EmptyPage from "./pages/EmptyPage";
+import KategoriDetail from "./pages/KategoriDetail";
+import Original from "./pages/Original";
 
 function App() {
   return (
@@ -15,12 +17,17 @@ function App() {
 
         <Route
           path="/original"
-          element={<EmptyPage />}
+          element={<Original />}
+        />
+
+        <Route
+          path="/kategori/:type"
+          element={<KategoriDetail />}
         />
 
         <Route
           path="/kategori"
-          element={<EmptyPage />}
+          element={<Original />}
         />
 
         <Route
