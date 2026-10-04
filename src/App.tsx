@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import EmptyPage from "./pages/EmptyPage";
 import KategoriDetail from "./pages/KategoriDetail";
 import Original from "./pages/Original";
+import Riwayat from "./pages/Riwayat";
 
 function App() {
   return (
@@ -31,8 +32,8 @@ function App() {
         />
 
         <Route
-          path="/riwayat"
-          element={<EmptyPage />}
+          path="/Riwayat"
+          element={<Riwayat />}
         />
 
         <Route
