@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 import type { HistoryItem } from "../data/history";
 
 export default function HistoryCard({ item }: { item: HistoryItem }) {
   return (
-    <div className="flex flex-row rounded-xl bg-[#111A2C] border border-white/5 p-4 sm:p-5 gap-4 sm:gap-6 transition-all hover:border-white/20">
+    <Link to={`/baca/${item.id}`} className="flex flex-row rounded-xl bg-[#111A2C] border border-white/5 p-4 sm:p-5 gap-4 sm:gap-6 transition-all hover:border-white/20">
       
       <div className="w-20 h-28 sm:w-24 sm:h-32 shrink-0 overflow-hidden rounded-md">
         <img 
@@ -37,6 +38,6 @@ export default function HistoryCard({ item }: { item: HistoryItem }) {
 
       </div>
       
-    </div>
+    </Link>
   );
 }
