@@ -15,8 +15,4 @@ export const navLinks = [
     label: "Riwayat Baca",
     path: "/riwayat",
   },
-  {
-    label: "Setting",
-    path: "/setting",
-  },
 ];
