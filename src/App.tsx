@@ -7,6 +7,8 @@ import EmptyPage from "./pages/EmptyPage";
 import KategoriDetail from "./pages/KategoriDetail";
 import Original from "./pages/Original";
 import Riwayat from "./pages/Riwayat";
+import BacaDetail from "./pages/BacaDetail";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -37,13 +39,14 @@ function App() {
         />
 
         <Route
-          path="/setting"
-          element={<EmptyPage />}
+          path="/baca/:id"
+          element={<BacaDetail />}
         />
+
 
         <Route
           path="/login"
-          element={<EmptyPage />}
+          element={<Login />}
         />
 
         <Route
