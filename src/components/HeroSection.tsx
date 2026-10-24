@@ -1,4 +1,4 @@
-import { Star, BookOpen, ArrowRight } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 import foto1 from "../assets/foto1.jpg";
 
 export default function HeroSection() {
