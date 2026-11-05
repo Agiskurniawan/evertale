@@ -1,9 +1,22 @@
 import { useState } from "react";
 import BookCard from "./BookCard";
-import { books } from "../data/books";
+import DataState from "./DataState";
+import { useFetch } from "../hooks/useFetch";
+import { api } from "../lib/api";
+import type { BookList } from "../types";
 
 export default function Populer() {
   const [activeTab, setActiveTab] = useState("Trending");
+
+  // Trending = paling banyak dibuka, Populer = paling banyak pembaca
+  const { data, loading, error } = useFetch(
+    () =>
+      api
+        .get<BookList>("/books", { params: { sort: activeTab === "Trending" ? "trending" : "popular", limit: 4 } })
+        .then((r) => r.data),
+    [activeTab]
+  );
+  const books = data?.data ?? [];
 
   return (
     <section className="w-full bg-[#080D18] py-10 md:py-16">
@@ -41,6 +54,7 @@ export default function Populer() {
           </div>
         </div>
 
+        <DataState loading={loading} error={error} empty={!loading && !error && books.length === 0} emptyText="Belum ada karya." />
         <div className="grid grid-cols-2 gap-6 md:gap-8 lg:grid-cols-4">
           {books.map((book) => (
             <BookCard key={book.id} book={book} />
