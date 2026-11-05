@@ -1,25 +1,49 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import { Crown, Settings, Heart, PenLine, LogOut, X, Camera, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { errorMessage } from "../lib/api";
 
 export default function Profil() {
-  const { username, bio, isAuthor, logout, updateProfile, registerAsAuthor } = useAuth();
+  const { username, bio, isAuthor, isLoggedIn, loading, logout, updateProfile, registerAsAuthor } = useAuth();
   const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [draftName, setDraftName] = useState(username);
   const [draftBio, setDraftBio] = useState(bio);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const openModal = () => {
     setDraftName(username);
     setDraftBio(bio);
+    setFormError("");
     setShowModal(true);
   };
 
-  const saveProfile = () => {
-    updateProfile(draftName.trim() || "Pembaca", draftBio.trim());
-    setShowModal(false);
+  const saveProfile = async () => {
+    setSaving(true);
+    setFormError("");
+    try {
+      await updateProfile(draftName.trim() || "Pembaca", draftBio.trim());
+      setShowModal(false);
+    } catch (e) {
+      setFormError(errorMessage(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // "Daftar Menjadi Author" → jadikan author di server dulu, baru buka dashboard
+  const handleAuthorClick = async (e: React.MouseEvent) => {
+    if (isAuthor) return;
+    e.preventDefault();
+    try {
+      await registerAsAuthor();
+      navigate("/author");
+    } catch (err) {
+      alert(errorMessage(err));
+    }
   };
 
   const handleLogout = () => {
@@ -51,9 +75,12 @@ export default function Profil() {
       label: isAuthor ? "Dashboard Author" : "Daftar Menjadi Author",
       sub: isAuthor ? "Kelola serial dan episode kamu" : "Mulai perjalananmu sebagai penulis",
       to: "/author",
-      onClick: () => registerAsAuthor(),
+      onClick: handleAuthorClick,
     },
   ];
+
+  if (loading) return null;
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
 
   return (
     <div className="min-h-[calc(100vh-72px)] px-4 py-10 md:px-12 lg:px-16">
@@ -164,11 +191,14 @@ export default function Profil() {
                 />
               </div>
 
+              {formError && <p className="text-xs text-red-400">{formError}</p>}
+
               <button
                 onClick={saveProfile}
-                className="mt-1 w-full rounded-xl bg-blue-500 py-2.5 text-sm font-semibold text-white hover:bg-blue-400 active:scale-[0.98] transition-all"
+                disabled={saving}
+                className="mt-1 w-full rounded-xl bg-blue-500 py-2.5 text-sm font-semibold text-white hover:bg-blue-400 active:scale-[0.98] transition-all disabled:opacity-60"
               >
-                Simpan
+                {saving ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
           </div>
