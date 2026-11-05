@@ -1,6 +1,7 @@
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Book } from "../data/books";
+import type { Book } from "../types";
+import { assetUrl } from "../lib/api";
 
 type BookCardProps = {
   book: Book;
@@ -11,7 +12,7 @@ export default function BookCard({ book }: BookCardProps) {
     <Link to={`/baca/${book.id}`} className="group cursor-pointer block overflow-hidden rounded-2xl border border-white/5 bg-[#0B1220] transition-all duration-300 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10">
       <div className="relative aspect-3/4 overflow-hidden">
         <img
-          src={book.cover}
+          src={assetUrl(book.cover)}
           alt={book.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
