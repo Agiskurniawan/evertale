@@ -1,23 +1,43 @@
 import { useState } from "react";
 import { Heart, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import { books } from "../data/books";
 import BookCard from "../components/BookCard";
-
-// Dummy favorit akun (buku-buku yang difavoritkan)
-const favBooks = books.slice(0, 3);
-
-// Dummy favorit kreator
-const favKreator = [
-  { id: 1, name: "Rina Maharani", works: 5, followers: "12K", genre: "Fantasi & Romansa" },
-  { id: 2, name: "Dian Kusuma", works: 3, followers: "8.4K", genre: "Drama & Novel" },
-  { id: 3, name: "Aditya Pratama", works: 7, followers: "21K", genre: "Aksi & Petualangan" },
-];
+import DataState from "../components/DataState";
+import { useAuth } from "../context/AuthContext";
+import { useFetch } from "../hooks/useFetch";
+import { api } from "../lib/api";
+import type { Book, Kreator } from "../types";
 
 type Tab = "akun" | "kreator";
 
 export default function Favorit() {
   const [tab, setTab] = useState<Tab>("akun");
+  const { isLoggedIn, loading: authLoading } = useAuth();
+
+  const books = useFetch(
+    () => api.get<{ data: Book[] }>("/favorites/books").then((r) => r.data.data),
+    [isLoggedIn],
+    isLoggedIn
+  );
+  const kreators = useFetch(
+    () => api.get<{ data: Kreator[] }>("/favorites/authors").then((r) => r.data.data),
+    [isLoggedIn],
+    isLoggedIn
+  );
+  const favBooks = books.data ?? [];
+  const favKreator = kreators.data ?? [];
+
+  if (authLoading) return <DataState loading />;
+  if (!isLoggedIn) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+        <p className="text-slate-400">Login dulu untuk melihat favoritmu.</p>
+        <Link to="/login" className="rounded-xl bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-400">
+          Login / Register
+        </Link>
+      </div>
+    );
+  }
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "akun", label: "Favorit Akun" },
@@ -54,7 +74,9 @@ export default function Favorit() {
         <div>
 
           {/* Tab: Favorit Akun */}
-          {tab === "akun" && (
+          {tab === "akun" && books.loading && <DataState loading />}
+          {tab === "akun" && books.error && <DataState error={books.error} />}
+          {tab === "akun" && !books.loading && !books.error && (
             favBooks.length === 0 ? (
               <EmptyState
                 icon={<Heart className="h-12 w-12 opacity-20 text-slate-400" />}
@@ -76,7 +98,9 @@ export default function Favorit() {
           )}
 
           {/* Tab: Favorit Kreator */}
-          {tab === "kreator" && (
+          {tab === "kreator" && kreators.loading && <DataState loading />}
+          {tab === "kreator" && kreators.error && <DataState error={kreators.error} />}
+          {tab === "kreator" && !kreators.loading && !kreators.error && (
             favKreator.length === 0 ? (
               <EmptyState
                 icon={<User className="h-12 w-12 opacity-20 text-slate-400" />}
