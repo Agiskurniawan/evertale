@@ -1,27 +1,47 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import BookCard from "../components/BookCard";
-import { books } from "../data/books";
-import { categories } from "../data/categories";
+import DataState from "../components/DataState";
+import { useFetch } from "../hooks/useFetch";
+import { api } from "../lib/api";
+import type { BookList, Category } from "../types";
 
 export default function KategoriDetail() {
-  useParams<{ type: string }>();
-  const [activeCategory, setActiveCategory] = useState("DRAMA");
-  const [sortBy, setSortBy] = useState("Popularitas");
+  const { type } = useParams<{ type: string }>(); // "novel" atau "komik"
+  const bookType = type === "novel" || type === "komik" ? type : undefined;
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState("popular");
 
-  const sortOptions = ["Popularitas", "Berdasarkan Jumlah Like", "Berdasarkan Tanggal"];
+  const sortOptions = [
+    { label: "Popularitas", key: "popular" },
+    { label: "Berdasarkan Jumlah Like", key: "likes" },
+    { label: "Berdasarkan Tanggal", key: "latest" },
+  ];
+
+  const { data: categories } = useFetch(() => api.get<{ data: Category[] }>("/categories").then((r) => r.data.data), []);
+  const activeId = selectedId ?? categories?.[0]?.id ?? null; // default: kategori pertama
+
+  const { data, loading, error } = useFetch(
+    () =>
+      api
+        .get<BookList>("/books", { params: { type: bookType, category: activeId, sort: sortBy, limit: 50 } })
+        .then((r) => r.data),
+    [bookType, activeId, sortBy],
+    activeId !== null
+  );
+  const books = data?.data ?? [];
 
   return (
     <div className="min-h-screen bg-[#0B1220] pb-20">
       <div className="border-b border-white/5 bg-[#0B1220]">
         <div className="px-6 md:px-12 lg:px-16 overflow-x-auto">
           <div className="flex space-x-6 md:space-x-8">
-            {categories.map((category) => (
+            {(categories ?? []).map((category) => (
               <button
                 key={category.id}
-                onClick={() => setActiveCategory(category.name)}
-                className={`py-4 text-xs md:text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                  activeCategory === category.name
+                onClick={() => setSelectedId(category.id)}
+                className={`py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap border-b-2 transition-colors ${
+                  activeId === category.id
                     ? "border-blue-500 text-blue-500"
                     : "border-transparent text-slate-400 hover:text-white"
                 }`}
@@ -36,19 +56,20 @@ export default function KategoriDetail() {
       <div className="px-6 md:px-12 lg:px-16 pt-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
           <div className="text-white text-sm font-bold">
-            {books.length} <span className="text-slate-400 font-normal">serial</span>
+            {bookType && <span className="mr-2 font-normal text-slate-400 capitalize">{bookType} ·</span>}
+            {data?.meta.total ?? 0} <span className="text-slate-400 font-normal">serial</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
             {sortOptions.map((option, index) => (
-              <div key={option} className="flex items-center">
+              <div key={option.key} className="flex items-center">
                 <button
-                  onClick={() => setSortBy(option)}
+                  onClick={() => setSortBy(option.key)}
                   className={`transition-colors ${
-                    sortBy === option ? "text-blue-500 font-medium" : "text-slate-400 hover:text-slate-300"
+                    sortBy === option.key ? "text-blue-500 font-medium" : "text-slate-400 hover:text-slate-300"
                   }`}
                 >
-                  {option}
+                  {option.label}
                 </button>
                 {index < sortOptions.length - 1 && (
                   <span className="mx-2 text-white/20">|</span>
@@ -58,6 +79,7 @@ export default function KategoriDetail() {
           </div>
         </div>
 
+        <DataState loading={loading} error={error} empty={!loading && !error && books.length === 0} emptyText="Belum ada karya di kategori ini." />
         <div className="grid grid-cols-2 gap-6 md:gap-8 lg:grid-cols-4 xl:grid-cols-5">
           {books.map((book) => (
             <BookCard key={book.id} book={book} />
