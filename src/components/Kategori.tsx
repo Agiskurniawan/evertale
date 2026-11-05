@@ -1,10 +1,22 @@
 import { useState } from "react";
 import BookCard from "./BookCard";
-import { books } from "../data/books";
-import { categories } from "../data/categories";
+import DataState from "./DataState";
+import { useFetch } from "../hooks/useFetch";
+import { api } from "../lib/api";
+import type { BookList, Category } from "../types";
 
 export default function Kategori() {
-    const [activeCategory, setActiveCategory] = useState("Semua");
+    const [activeId, setActiveId] = useState<number | null>(null); // null = Semua
+
+    const { data: categories } = useFetch(() => api.get<{ data: Category[] }>("/categories").then((r) => r.data.data), []);
+    const { data, loading, error } = useFetch(
+        () =>
+            api
+                .get<BookList>("/books", { params: { category: activeId ?? undefined, sort: "popular", limit: 8 } })
+                .then((r) => r.data),
+        [activeId]
+    );
+    const books = data?.data ?? [];
     
     return (
     <section className="w-full bg-[#080D18] py-16 md:py-20">
@@ -17,12 +29,12 @@ export default function Kategori() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-10">
-            {categories.map((category) => (
+            {[{ id: null, name: "Semua" }, ...(categories ?? [])].map((category) => (
             <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.name)}
-            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-300 ${
-                activeCategory === category.name
+            key={category.id ?? "semua"}
+            onClick={() => setActiveId(category.id)}
+            className={`rounded-full px-6 py-2 text-sm font-medium uppercase transition-all duration-300 ${
+                activeId === category.id
                 ? "bg-[#3B82F6] text-white"
                 : "border border-white/20 bg-transparent text-white hover:bg-white/10"
             }`}
@@ -32,7 +44,7 @@ export default function Kategori() {
         ))}
         </div>
 
-        
+        <DataState loading={loading} error={error} empty={!loading && !error && books.length === 0} emptyText="Belum ada karya di kategori ini." />
         <div className="grid grid-cols-2 gap-6 md:gap-8 lg:grid-cols-4">
         {books.map((book) => (
             <BookCard key={book.id} book={book} />
