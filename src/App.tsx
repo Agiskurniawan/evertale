@@ -14,6 +14,7 @@ import Favorit from "./pages/Favorit";
 import AuthorDashboard from "./pages/author/AuthorDashboard";
 import AuthorKarya from "./pages/author/AuthorKarya";
 import AuthorTulis from "./pages/author/AuthorTulis";
+import AuthorBuatSerial from "./pages/author/AuthorBuatSerial";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
         <Route path="/profil" element={<Profil />} />
         <Route path="/favorit" element={<Favorit />} />
         <Route path="/author" element={<AuthorDashboard />} />
+        <Route path="/author/buat-serial" element={<AuthorBuatSerial />} />
         <Route path="/author/karya/:id" element={<AuthorKarya />} />
         <Route path="/author/tulis" element={<AuthorTulis />} />
 
