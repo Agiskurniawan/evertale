@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import type { HistoryItem } from "../data/history";
+import type { HistoryItem } from "../types";
+import { assetUrl } from "../lib/api";
 
 export default function HistoryCard({ item }: { item: HistoryItem }) {
   return (
@@ -7,7 +8,7 @@ export default function HistoryCard({ item }: { item: HistoryItem }) {
       
       <div className="w-20 h-28 sm:w-24 sm:h-32 shrink-0 overflow-hidden rounded-md">
         <img 
-          src={item.cover} 
+          src={assetUrl(item.cover)} 
           alt={item.title} 
           className="h-full w-full object-cover" 
         />
