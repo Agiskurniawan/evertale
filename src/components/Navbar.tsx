@@ -3,7 +3,8 @@ import { Search, Bell, Moon, ChevronDown, User, X, BookOpen } from "lucide-react
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { useAuth } from "../context/AuthContext";
-import { books } from "../data/books";
+import { api, assetUrl } from "../lib/api";
+import type { Book } from "../types";
 
 export default function Navbar() {
   const { isLoggedIn, isAuthor, username, logout } = useAuth();
@@ -13,12 +14,26 @@ export default function Navbar() {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const results = query.trim().length > 0
-    ? books.filter((b) =>
-        b.title.toLowerCase().includes(query.toLowerCase()) ||
-        b.genre.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
+  // Pencarian ke backend (judul atau genre), ditunda 250ms supaya tidak spam server
+  const [found, setFound] = useState<{ q: string; items: Book[] }>({ q: "", items: [] });
+  const trimmed = query.trim();
+  const searching = trimmed.length > 0 && found.q !== trimmed;
+  const results = trimmed.length > 0 && found.q === trimmed ? found.items : [];
+
+  useEffect(() => {
+    if (!trimmed) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      api
+        .get<{ data: Book[] }>("/books", { params: { q: trimmed, limit: 8 } })
+        .then((res) => !cancelled && setFound({ q: trimmed, items: res.data.data }))
+        .catch(() => !cancelled && setFound({ q: trimmed, items: [] }));
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [trimmed]);
 
   // Fokus input saat search dibuka
   useEffect(() => {
@@ -182,7 +197,9 @@ export default function Navbar() {
             {/* Hasil */}
             {query.trim().length > 0 && (
               <div className="max-h-72 overflow-y-auto">
-                {results.length === 0 ? (
+                {searching ? (
+                  <div className="py-10 text-center text-sm text-slate-500">Mencari...</div>
+                ) : results.length === 0 ? (
                   <div className="flex flex-col items-center gap-2 py-10 text-slate-600">
                     <BookOpen className="h-7 w-7 opacity-40" />
                     <p className="text-sm">Tidak ada hasil untuk &ldquo;{query}&rdquo;</p>
@@ -194,7 +211,7 @@ export default function Navbar() {
                       onClick={() => handleResultClick(book.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left border-b border-white/5 last:border-0"
                     >
-                      <img src={book.cover} alt={book.title} className="h-10 w-7 rounded-lg object-cover flex-shrink-0" />
+                      <img src={assetUrl(book.cover)} alt={book.title} className="h-10 w-7 rounded-lg object-cover flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-white truncate">{book.title}</p>
                         <p className="text-xs text-slate-500 mt-0.5">{book.genre} · ⭐ {book.rating}</p>
