@@ -2,16 +2,40 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { errorMessage } from "../lib/api";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
-  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const switchMode = (toLogin: boolean) => {
+    setIsLogin(toLogin);
+    setError("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login();
-    navigate("/");
+    setError("");
+    if (!isLogin && password !== confirm) {
+      setError("Konfirmasi password tidak sama.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      if (isLogin) await login(email, password);
+      else await register(email, password);
+      navigate("/");
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -41,7 +65,7 @@ export default function Login() {
           {/* Toggle Switch */}
           <div className="flex bg-[#192235] rounded-full p-1 mb-6 border border-white/5">
             <button
-              onClick={() => setIsLogin(true)}
+              onClick={() => switchMode(true)}
               className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
                 isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-white"
               }`}
@@ -49,7 +73,7 @@ export default function Login() {
               Masuk
             </button>
             <button
-              onClick={() => setIsLogin(false)}
+              onClick={() => switchMode(false)}
               className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
                 !isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-white"
               }`}
@@ -65,6 +89,8 @@ export default function Login() {
               <input
                 type="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
                 className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
               />
@@ -75,6 +101,9 @@ export default function Login() {
               <input
                 type="password"
                 required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
                 className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
               />
@@ -86,17 +115,22 @@ export default function Login() {
                 <input
                   type="password"
                   required
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Ulangi password"
                   className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 />
               </div>
             )}
 
+            {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>}
+
             <button
               type="submit"
-              className="mt-2 w-full rounded-xl bg-blue-500 py-3.5 text-sm font-semibold text-white transition-all hover:bg-blue-400 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98]"
+              disabled={submitting}
+              className="mt-2 w-full rounded-xl bg-blue-500 py-3.5 text-sm font-semibold text-white transition-all hover:bg-blue-400 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-60"
             >
-              {isLogin ? "Masuk" : "Daftar"}
+              {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
             </button>
           </form>
 
@@ -110,6 +144,7 @@ export default function Login() {
           {/* Google Button */}
           <button
             type="button"
+            onClick={() => setError("Login dengan Google belum tersedia.")}
             className="w-full rounded-xl bg-transparent border border-white/20 py-3 text-sm font-semibold text-white flex items-center justify-center gap-3 transition-colors hover:bg-white/5 active:scale-[0.98]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -137,7 +172,7 @@ export default function Login() {
           <p className="mt-6 text-center text-sm text-slate-400">
             {isLogin ? "Belum punya akun? " : "Sudah punya akun? "}
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => switchMode(!isLogin)}
               className="text-white hover:text-blue-400 font-medium transition-colors"
             >
               {isLogin ? "Daftar" : "Masuk"}
