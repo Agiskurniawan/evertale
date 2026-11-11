@@ -9,17 +9,17 @@ type Props = {
 export default function DataState({ loading, error, empty, emptyText = "Belum ada data." }: Props) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-sm text-slate-500">
-        <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-400" />
+      <div className="flex items-center justify-center py-20 text-sm text-gray-500 dark:text-slate-400">
+        <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-gray-400 dark:border-slate-600 border-t-blue-500 dark:border-t-blue-400" />
         Memuat...
       </div>
     );
   }
   if (error) {
-    return <div className="py-20 text-center text-sm text-red-400">{error}</div>;
+    return <div className="py-20 text-center text-sm text-red-500 dark:text-red-400">{error}</div>;
   }
   if (empty) {
-    return <div className="py-20 text-center text-sm text-slate-500">{emptyText}</div>;
+    return <div className="py-20 text-center text-sm text-gray-500 dark:text-slate-400">{emptyText}</div>;
   }
   return null;
 }

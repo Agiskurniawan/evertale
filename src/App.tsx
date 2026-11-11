@@ -10,15 +10,19 @@ import Riwayat from "./pages/Riwayat";
 import BacaDetail from "./pages/BacaDetail";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
+import EditProfil from "./pages/EditProfil";
 import Favorit from "./pages/Favorit";
 import AuthorDashboard from "./pages/author/AuthorDashboard";
 import AuthorKarya from "./pages/author/AuthorKarya";
 import AuthorTulis from "./pages/author/AuthorTulis";
 import AuthorBuatSerial from "./pages/author/AuthorBuatSerial";
+import { useTheme } from "./context/ThemeContext";
 
 function App() {
+  const { darkMode } = useTheme();
+
   return (
-    <div className="min-h-screen bg-[#0B1220] font-sans">
+    <div className={`${darkMode ? "dark" : ""} min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-[#0B1220] dark:text-white font-sans`}>
       <Navbar />
 
       <Routes>
@@ -52,6 +56,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/profil" element={<Profil />} />
+        <Route path="/profil/edit" element={<EditProfil />} />
+        <Route path="/edit-profil" element={<EditProfil />} />
         <Route path="/favorit" element={<Favorit />} />
         <Route path="/author" element={<AuthorDashboard />} />
         <Route path="/author/buat-serial" element={<AuthorBuatSerial />} />

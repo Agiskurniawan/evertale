@@ -40,34 +40,34 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center py-10 px-4 min-h-[calc(100vh-100px)]">
-      <div className="w-full max-w-[420px] bg-[#101726] rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative">
+      <div className="w-full max-w-[420px] bg-white dark:bg-[#101726] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/5 relative">
         
         {/* Top Gradient Background */}
-        <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-500/40 via-blue-600/10 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-500/15 via-blue-500/5 to-transparent dark:from-blue-500/40 dark:via-blue-600/10 dark:to-transparent pointer-events-none" />
 
         <div className="relative z-10 p-8">
           {/* Logo */}
           <div className="flex items-center gap-2 mb-8">
-            <div className="bg-white/10 p-1.5 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/10">
-                <BookOpen className="h-5 w-5 text-white" />
+            <div className="bg-gray-100 dark:bg-white/10 p-1.5 rounded-lg flex items-center justify-center backdrop-blur-sm border border-gray-200 dark:border-white/10">
+                <BookOpen className="h-5 w-5 text-gray-900 dark:text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-              Ever<span className="text-blue-400">Tale</span>
+            <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+              Ever<span className="text-blue-500 dark:text-blue-400">Tale</span>
             </span>
           </div>
 
           {/* Heading */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white mb-2">Selamat Datang</h1>
-            <p className="text-sm text-slate-400">EverTale - Dunia Cerita Dimulai di Sini</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Selamat Datang</h1>
+            <p className="text-sm text-gray-600 dark:text-slate-400">EverTale - Dunia Cerita Dimulai di Sini</p>
           </div>
 
           {/* Toggle Switch */}
-          <div className="flex bg-[#192235] rounded-full p-1 mb-6 border border-white/5">
+          <div className="flex bg-gray-100 dark:bg-[#192235] rounded-full p-1 mb-6 border border-gray-200 dark:border-white/5">
             <button
               onClick={() => switchMode(true)}
               className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-white"
+                isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               Masuk
@@ -75,7 +75,7 @@ export default function Login() {
             <button
               onClick={() => switchMode(false)}
               className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                !isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-white"
+                !isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               Daftar
@@ -85,19 +85,19 @@ export default function Login() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-white ml-1">Email</label>
+              <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Email</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-white ml-1">Password</label>
+              <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Password</label>
               <input
                 type="password"
                 required
@@ -105,20 +105,20 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
               />
             </div>
 
             {!isLogin && (
               <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="text-xs font-semibold text-white ml-1">Konfirmasi Password</label>
+                <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Konfirmasi Password</label>
                 <input
                   type="password"
                   required
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Ulangi password"
-                  className="w-full bg-[#0B1220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                  className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 />
               </div>
             )}
@@ -136,16 +136,16 @@ export default function Login() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/10"></div>
-            <span className="text-xs text-slate-500 font-medium">atau</span>
-            <div className="flex-1 h-px bg-white/10"></div>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
+            <span className="text-xs text-gray-400 dark:text-slate-500 font-medium">atau</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
           </div>
 
           {/* Google Button */}
           <button
             type="button"
             onClick={() => setError("Login dengan Google belum tersedia.")}
-            className="w-full rounded-xl bg-transparent border border-white/20 py-3 text-sm font-semibold text-white flex items-center justify-center gap-3 transition-colors hover:bg-white/5 active:scale-[0.98]"
+            className="w-full rounded-xl bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 py-3 text-sm font-semibold text-gray-700 dark:text-white flex items-center justify-center gap-3 transition-colors hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.98]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -169,11 +169,11 @@ export default function Login() {
           </button>
 
           {/* Bottom text */}
-          <p className="mt-6 text-center text-sm text-slate-400">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-slate-400">
             {isLogin ? "Belum punya akun? " : "Sudah punya akun? "}
             <button
               onClick={() => switchMode(!isLogin)}
-              className="text-white hover:text-blue-400 font-medium transition-colors"
+              className="text-gray-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 font-medium transition-colors"
             >
               {isLogin ? "Daftar" : "Masuk"}
             </button>

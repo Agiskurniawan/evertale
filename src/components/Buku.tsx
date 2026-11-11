@@ -12,13 +12,13 @@ export default function Buku() {
     const books = data?.data ?? [];
 
     return (
-    <section className="min-h-screen w-full bg-[#080D18] py-16 md:py-20">
+    <section className="min-h-screen w-full bg-white dark:bg-[#080D18] py-16 md:py-20">
     <div className="w-full px-6 md:px-12 lg:px-16">
         <div className="mb-10">
-            <div className="flex items-center gap-3 text-xs font-bold tracking-[0.15em] text-blue-400 uppercase">
+            <div className="flex items-center gap-3 text-xs font-bold tracking-[0.15em] text-blue-500 dark:text-blue-400 uppercase">
                 <span>Pilihan Spesial</span>
             </div>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-white md:text-4xl">Rekomendasi untuk Kamu</h2>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white md:text-4xl">Rekomendasi untuk Kamu</h2>
         </div>
 
         <DataState loading={loading} error={error} empty={!loading && !error && books.length === 0} emptyText="Belum ada karya." />

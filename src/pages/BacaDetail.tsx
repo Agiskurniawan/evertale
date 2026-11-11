@@ -28,7 +28,7 @@ function BacaDetailContent({ id }: { id: string }) {
   if (book.notFound) return <Navigate to="/404" replace />;
   if (book.loading || book.error || !book.data) {
     return (
-      <div className="min-h-screen bg-[#0B1220]">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0B1220]">
         <DataState loading={book.loading} error={book.error} />
       </div>
     );
@@ -88,7 +88,7 @@ function BacaDetailContent({ id }: { id: string }) {
   }));
 
   return (
-    <div className="min-h-screen bg-[#0B1220] flex flex-col md:bg-[#080D18]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1220] flex flex-col md:bg-gray-100 dark:md:bg-[#080D18]">
       {/* HEADER SECTION */}
       <div className="relative w-full h-[400px] md:h-[500px]">
         {/* Background Blur */}
@@ -96,7 +96,7 @@ function BacaDetailContent({ id }: { id: string }) {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${bookInfo.bgImage})` }}
         >
-          <div className="absolute inset-0 bg-[#0B1220]/80 backdrop-blur-md"></div>
+          <div className="absolute inset-0 bg-gray-900/80 dark:bg-[#0B1220]/80 backdrop-blur-md"></div>
         </div>
 
         {/* Mobile Top Bar */}
@@ -117,7 +117,7 @@ function BacaDetailContent({ id }: { id: string }) {
           <h1 className="text-white text-xl md:text-3xl font-extrabold mt-6 text-center px-4 max-w-4xl line-clamp-2 md:line-clamp-none">
             {bookInfo.title}
           </h1>
-          <p className="text-slate-400 text-sm mt-3 hidden md:block">
+          <p className="text-slate-300 dark:text-slate-400 text-sm mt-3 hidden md:block">
             {bookInfo.author}
           </p>
         </div>
@@ -125,40 +125,40 @@ function BacaDetailContent({ id }: { id: string }) {
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 w-full max-w-6xl mx-auto md:px-4 -mt-4 md:-mt-10 relative z-20">
-        <div className="bg-[#111A2C] border border-white/5 md:rounded-xl rounded-t-3xl shadow-xl flex flex-col md:flex-row overflow-hidden min-h-[500px]">
+        <div className="bg-white dark:bg-[#111A2C] border border-gray-200 dark:border-white/5 md:rounded-xl rounded-t-3xl shadow-xl flex flex-col md:flex-row overflow-hidden min-h-[500px]">
           
           {/* MOBILE ACTION BUTTONS */}
-          <div className="md:hidden flex justify-around items-center p-6 border-b border-white/5">
+          <div className="md:hidden flex justify-around items-center p-6 border-b border-gray-200 dark:border-white/5">
             <div className="flex flex-col items-center gap-2">
-              <button onClick={toggleFavorite} className="w-12 h-12 bg-white/5 text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
-                <Bookmark size={22} className={isFav ? "fill-blue-400" : ""} />
+              <button onClick={toggleFavorite} className="w-12 h-12 bg-gray-100 dark:bg-white/5 text-blue-500 dark:text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
+                <Bookmark size={22} className={isFav ? "fill-blue-500 dark:fill-blue-400" : ""} />
               </button>
-              <span className="text-xs text-slate-300">List</span>
+              <span className="text-xs text-gray-600 dark:text-slate-300">List</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <button onClick={openRate} className="w-12 h-12 bg-white/5 text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
+              <button onClick={openRate} className="w-12 h-12 bg-gray-100 dark:bg-white/5 text-blue-500 dark:text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
                 <Star size={22} className={currentRating ? "fill-amber-400 text-amber-400" : ""} />
               </button>
-              <span className="text-xs text-slate-300">Rate</span>
+              <span className="text-xs text-gray-600 dark:text-slate-300">Rate</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <button className="w-12 h-12 bg-white/5 text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
+              <button className="w-12 h-12 bg-gray-100 dark:bg-white/5 text-blue-500 dark:text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
                 <MessageSquare size={22} />
               </button>
-              <span className="text-xs text-slate-300">Komen</span>
+              <span className="text-xs text-gray-600 dark:text-slate-300">Komen</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <button className="w-12 h-12 bg-white/5 text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
+              <button className="w-12 h-12 bg-gray-100 dark:bg-white/5 text-blue-500 dark:text-blue-400 rounded-full flex justify-center items-center hover:bg-blue-500/20 transition-colors">
                 <Download size={22} />
               </button>
-              <span className="text-xs text-slate-300">Download</span>
+              <span className="text-xs text-gray-600 dark:text-slate-300">Download</span>
             </div>
           </div>
 
           {/* MOBILE SINOPSIS */}
-          <div className="md:hidden p-6 border-b border-white/5">
-            <h2 className="text-lg font-bold text-white mb-3">Sinopsis</h2>
-            <p className="text-slate-400 text-sm leading-relaxed">
+          <div className="md:hidden p-6 border-b border-gray-200 dark:border-white/5">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Sinopsis</h2>
+            <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">
               {bookInfo.synopsis}
             </p>
           </div>
@@ -166,35 +166,35 @@ function BacaDetailContent({ id }: { id: string }) {
           {/* EPISODE LIST COLUMN */}
           <div className="flex-1 p-4 md:p-8">
             <div className="hidden md:flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">Episode</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Episode</h2>
             </div>
-            <h2 className="md:hidden text-lg font-bold text-white px-2 mb-4">Episode</h2>
+            <h2 className="md:hidden text-lg font-bold text-gray-900 dark:text-white px-2 mb-4">Episode</h2>
             
             <DataState loading={eps.loading} error={eps.error} empty={!eps.loading && !eps.error && episodes.length === 0} emptyText="Belum ada episode yang terbit." />
             <div className="flex flex-col gap-3">
               {episodes.map((ep) => (
-                <div key={ep.id} className="group flex items-center p-3 hover:bg-white/5 rounded-xl cursor-pointer border md:border-b md:border-x-0 md:border-t-0 border-white/5 transition-colors">
+                <div key={ep.id} className="group flex items-center p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl cursor-pointer border md:border-b md:border-x-0 md:border-t-0 border-gray-100 dark:border-white/5 transition-colors">
                   <img src={ep.img} alt={ep.title} className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg" />
                   <div className="ml-4 flex-1">
-                    <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">{ep.title}</h3>
-                    <p className="text-xs text-slate-400 mt-1 md:hidden">{ep.date}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">{ep.title}</h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 md:hidden">{ep.date}</p>
                   </div>
                   
                   {/* Desktop Middle Info */}
                   <div className="hidden md:flex flex-1 items-center justify-between px-8">
-                    <span className="text-sm text-slate-400">{ep.date}</span>
-                    <div className="flex items-center gap-1.5 text-slate-400">
+                    <span className="text-sm text-gray-500 dark:text-slate-400">{ep.date}</span>
+                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400">
                       <Star size={16} className="text-amber-400 fill-amber-400/20" />
-                      <span className="text-sm text-white">{ep.likes}</span>
+                      <span className="text-sm text-gray-900 dark:text-white">{ep.likes}</span>
                     </div>
-                    <span className="text-sm font-bold text-slate-300">{ep.num}</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-slate-300">{ep.num}</span>
                   </div>
 
                   {/* Mobile Right Info */}
                   <div className="md:hidden flex flex-col items-end">
-                    <div className="flex items-center gap-1 border border-white/10 rounded-full px-2 py-1 bg-[#0B1220]">
+                    <div className="flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-full px-2 py-1 bg-gray-100 dark:bg-[#0B1220]">
                       <Star size={12} className="text-amber-400 fill-amber-400" />
-                      <span className="text-xs font-semibold text-white">{ep.likes}</span>
+                      <span className="text-xs font-semibold text-gray-900 dark:text-white">{ep.likes}</span>
                     </div>
                   </div>
                 </div>
@@ -203,28 +203,28 @@ function BacaDetailContent({ id }: { id: string }) {
           </div>
 
           {/* DESKTOP INFO SIDEBAR */}
-          <div className="hidden md:flex flex-col w-[350px] p-8 border-l border-white/5 bg-[#0B1220]/30">
+          <div className="hidden md:flex flex-col w-[350px] p-8 border-l border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-[#0B1220]/30">
              <div className="flex items-center gap-6 mb-8">
-               <div className="flex items-center gap-2 text-blue-400">
+               <div className="flex items-center gap-2 text-blue-500 dark:text-blue-400">
                  <Eye size={20} />
-                 <span className="font-bold text-white">{bookInfo.views}</span>
+                 <span className="font-bold text-gray-900 dark:text-white">{bookInfo.views}</span>
                </div>
-               <div className="flex items-center gap-2 text-blue-400">
+               <div className="flex items-center gap-2 text-blue-500 dark:text-blue-400">
                  <Users size={20} />
-                 <span className="font-bold text-white">{bookInfo.readers}</span>
+                 <span className="font-bold text-gray-900 dark:text-white">{bookInfo.readers}</span>
                </div>
              </div>
 
              <div className="flex items-center gap-3 mb-6">
                <span className="bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-md">UP</span>
-               <span className="font-bold text-slate-300">Update {bookInfo.updateDay}</span>
+               <span className="font-bold text-gray-800 dark:text-slate-300">Update {bookInfo.updateDay}</span>
              </div>
 
-             <p className="text-sm text-slate-400 leading-relaxed mb-6">
+             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed mb-6">
                {bookInfo.synopsis}
              </p>
              
-             <p className="text-xs text-slate-500 mb-8 italic bg-white/5 p-3 rounded-lg border border-white/5">
+             <p className="text-xs text-gray-500 dark:text-slate-500 mb-8 italic bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-gray-200 dark:border-white/5">
                Serial ini diberi rating Remaja (13+). Silakan tinjau halaman Peringkat Konten untuk informasi lebih lanjut.
              </p>
 
@@ -233,20 +233,20 @@ function BacaDetailContent({ id }: { id: string }) {
              </button>
              
              {/* Desktop Extra Actions Container */}
-             <div className="flex justify-around items-center mt-8 border-t border-white/5 pt-8">
-                <div onClick={toggleFavorite} className="flex flex-col items-center gap-2 cursor-pointer text-slate-400 hover:text-blue-400 transition-colors group">
+             <div className="flex justify-around items-center mt-8 border-t border-gray-200 dark:border-white/5 pt-8">
+                <div onClick={toggleFavorite} className="flex flex-col items-center gap-2 cursor-pointer text-gray-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group">
                   <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
-                    <Bookmark size={22} className={isFav ? "fill-blue-400 text-blue-400" : ""} />
+                    <Bookmark size={22} className={isFav ? "fill-blue-500 dark:fill-blue-400 text-blue-500 dark:text-blue-400" : ""} />
                   </div>
                   <span className="text-xs font-semibold">List</span>
                 </div>
-                <div onClick={openRate} className="flex flex-col items-center gap-2 cursor-pointer text-slate-400 hover:text-blue-400 transition-colors group">
+                <div onClick={openRate} className="flex flex-col items-center gap-2 cursor-pointer text-gray-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group">
                   <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
                     <Star size={22} className={currentRating ? "fill-amber-400 text-amber-400" : ""} />
                   </div>
                   <span className="text-xs font-semibold">Rate</span>
                 </div>
-                <div className="flex flex-col items-center gap-2 cursor-pointer text-slate-400 hover:text-blue-400 transition-colors group">
+                <div className="flex flex-col items-center gap-2 cursor-pointer text-gray-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group">
                   <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
                     <Share2 size={22} />
                   </div>
@@ -261,7 +261,7 @@ function BacaDetailContent({ id }: { id: string }) {
       {notice && (
         <button
           onClick={() => setNotice("")}
-          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/10 bg-[#101726] px-5 py-2.5 text-sm text-white shadow-2xl"
+          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#101726] px-5 py-2.5 text-sm text-gray-900 dark:text-white shadow-2xl"
         >
           {notice}
         </button>
@@ -273,21 +273,21 @@ function BacaDetailContent({ id }: { id: string }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
           onClick={(e) => e.target === e.currentTarget && setRateOpen(false)}
         >
-          <div className="w-full max-w-xs rounded-2xl border border-white/10 bg-[#101726] p-6 text-center shadow-2xl">
+          <div className="w-full max-w-xs rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#101726] p-6 text-center shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Beri Rating</h3>
-              <button onClick={() => setRateOpen(false)} className="text-slate-500 hover:text-white">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">Beri Rating</h3>
+              <button onClick={() => setRateOpen(false)} className="text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="flex justify-center gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
                 <button key={n} onClick={() => sendRating(n)} aria-label={`${n} bintang`} className="p-1 transition-transform hover:scale-110">
-                  <Star size={32} className={n <= (currentRating ?? 0) ? "fill-amber-400 text-amber-400" : "text-slate-600"} />
+                  <Star size={32} className={n <= (currentRating ?? 0) ? "fill-amber-400 text-amber-400" : "text-gray-300 dark:text-slate-600"} />
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs text-slate-500">Rating saat ini: {detail.rating} dari {detail.rating_count} penilaian</p>
+            <p className="mt-3 text-xs text-gray-500 dark:text-slate-500">Rating saat ini: {detail.rating} dari {detail.rating_count} penilaian</p>
           </div>
         </div>
       )}

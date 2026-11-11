@@ -21,12 +21,12 @@ export default function HeroSection() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  if (loading) return <section className="min-h-[70vh] bg-[#080D18]" />;
+  if (loading) return <section className="min-h-[70vh] bg-gray-900 dark:bg-[#080D18]" />;
   const book = slides[index % Math.max(slides.length, 1)];
   if (!book) return null;
 
   return (
-    <section className="relative min-h-[70vh] overflow-hidden bg-[#080D18]">
+    <section className="relative min-h-[70vh] overflow-hidden bg-gray-900 dark:bg-[#080D18]">
       <div className="absolute inset-0">
         <img
           src={assetUrl(book.banner ?? book.cover)}

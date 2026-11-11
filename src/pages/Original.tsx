@@ -23,18 +23,18 @@ export default function Original() {
   const books = data?.data ?? [];
 
   return (
-    <div className="min-h-screen bg-[#0B1220] pb-20">
-      <div className="border-b border-white/5 bg-[#0B1220]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1220] pb-20">
+      <div className="border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0B1220]">
         <div className="px-6 md:px-12 lg:px-16 overflow-x-auto">
           <div className="flex items-center gap-8 md:gap-12 w-full max-w-5xl">
             {days.map((day) => (
               <button
                 key={day}
                 onClick={() => setActiveDay(day)}
-                className={`py-4 text-xs md:text-sm whitespace-nowrap border-b-[3px] transition-all hover:text-white ${
+                className={`py-4 text-xs md:text-sm whitespace-nowrap border-b-[3px] transition-all hover:text-gray-900 dark:hover:text-white ${
                   activeDay === day
                     ? "border-blue-500 text-blue-500 font-bold"
-                    : "border-transparent text-slate-400 font-semibold hover:border-slate-400"
+                    : "border-transparent text-gray-500 font-semibold hover:border-gray-400 dark:text-slate-400 dark:hover:border-slate-400"
                 }`}
               >
                 {day}
@@ -47,8 +47,8 @@ export default function Original() {
       <div className="px-6 md:px-12 lg:px-16 pt-8">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-          <div className="text-white text-sm font-bold">
-            {data?.meta.total ?? 0} <span className="text-slate-400 font-normal">serial</span>
+          <div className="text-gray-900 dark:text-white text-sm font-bold">
+            {data?.meta.total ?? 0} <span className="text-gray-500 dark:text-slate-400 font-normal">serial</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
@@ -57,13 +57,13 @@ export default function Original() {
                 <button
                   onClick={() => setSortBy(option.key)}
                   className={`transition-colors ${
-                    sortBy === option.key ? "text-blue-500 font-medium" : "text-slate-400 hover:text-slate-300"
+                    sortBy === option.key ? "text-blue-500 font-medium" : "text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-300"
                   }`}
                 >
                   {option.label}
                 </button>
                 {index < sortOptions.length - 1 && (
-                  <span className="mx-2 text-white/20">|</span>
+                  <span className="mx-2 text-gray-300 dark:text-white/20">|</span>
                 )}
               </div>
             ))}

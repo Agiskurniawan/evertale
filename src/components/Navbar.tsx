@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Bell, Moon, ChevronDown, User, X, BookOpen } from "lucide-react";
+import { Search, Bell, Moon, Sun, ChevronDown, User, X, BookOpen } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { api, assetUrl } from "../lib/api";
 import type { Book } from "../types";
 
 export default function Navbar() {
-  const { isLoggedIn, isAuthor, username, logout } = useAuth();
+  const { isLoggedIn, isAuthor, username, user, logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -53,14 +55,14 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#0B1220]/90 backdrop-blur">
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/90 backdrop-blur dark:border-white/5 dark:bg-[#0B1220]/90 transition-colors duration-300">
         <div className="flex items-center justify-between px-6 py-7 md:px-12 lg:px-16">
 
           {/* Kiri: Logo + Nav */}
           <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-lg font-bold tracking-tight text-white">
-                Ever<span className="text-blue-400">Tale</span>
+              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                Ever<span className="text-blue-500">Tale</span>
               </span>
             </Link>
 
@@ -70,20 +72,20 @@ export default function Navbar() {
                   <div key={link.path} className="relative group py-2">
                     <NavLink
                       to={link.path}
-                      className="text text-slate-300 transition-colors hover:text-white flex items-center gap-1"
+                      className="text text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white flex items-center gap-1"
                     >
                       {link.label}
                       <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
                     </NavLink>
                     <div className="absolute left-0 top-full mt-1 w-36 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="rounded-lg bg-[#0B1220] border border-white/10 shadow-xl overflow-hidden flex flex-col py-2">
-                        <Link to="/kategori/novel" className="px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">Novel</Link>
-                        <Link to="/kategori/komik" className="px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">Komik</Link>
+                      <div className="rounded-lg bg-white border border-gray-200 shadow-xl overflow-hidden flex flex-col py-2 dark:bg-[#0B1220] dark:border-white/10">
+                        <Link to="/kategori/novel" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white transition-colors">Novel</Link>
+                        <Link to="/kategori/komik" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white transition-colors">Komik</Link>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <NavLink key={link.path} to={link.path} className="text text-slate-300 transition-colors hover:text-white">
+                  <NavLink key={link.path} to={link.path} className="text text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white">
                     {link.label}
                   </NavLink>
                 )
@@ -98,17 +100,23 @@ export default function Navbar() {
             <button
               aria-label="Cari"
               onClick={() => setSearchOpen(true)}
-              className="text-slate-300 transition-colors hover:text-white"
+              className="text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            <button aria-label="Notifikasi" className="text-slate-300 transition-colors hover:text-white">
+            <button aria-label="Notifikasi" className="text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white">
               <Bell className="h-5 w-5" />
             </button>
 
-            <button aria-label="Ganti tema" className="text-slate-300 transition-colors hover:text-white">
-              <Moon className="h-5 w-5" />
+            <button
+              type="button"
+              aria-label="Ganti tema"
+              onClick={toggleDarkMode}
+              className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
+              title={darkMode ? "Mode Gelap (Aktif)" : "Mode Terang (Aktif)"}
+            >
+              {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </button>
 
             {/* Pill Dashboard — muncul jika sudah daftar author */}
@@ -129,23 +137,30 @@ export default function Navbar() {
               <div className="relative group">
                 <Link
                   to="/profil"
-                  className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 transition-colors cursor-pointer overflow-hidden shadow-lg shadow-blue-500/20 active:scale-[0.98]"
+                  className="h-10 w-10 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-white hover:border-blue-400 transition-colors cursor-pointer overflow-hidden shadow-lg shadow-blue-500/10 active:scale-[0.98]"
                 >
-                  <User className="h-5 w-5" />
+                  {user?.avatar_url ? (
+                    <img src={assetUrl(user.avatar_url)} alt={username} className="h-full w-full object-cover" />
+                  ) : (
+                    <User className="h-5 w-5 text-blue-400" />
+                  )}
                 </Link>
 
                 <div className="absolute right-0 top-full mt-3 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="rounded-xl bg-[#131B2B] border border-white/10 shadow-2xl overflow-hidden flex flex-col py-1.5">
-                    <div className="px-4 py-2 border-b border-white/10 mb-1">
-                      <p className="text-sm font-semibold text-white">{username}</p>
-                      <p className="text-xs text-slate-500">Lihat profil</p>
+                  <div className="rounded-xl bg-white border border-gray-200 shadow-2xl overflow-hidden flex flex-col py-1.5 dark:bg-[#131B2B] dark:border-white/10">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-white/10 mb-1">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{username}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">Lihat profil</p>
                     </div>
-                    <Link to="/profil" className="px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors mx-1.5 rounded-lg">
+                    <Link to="/profil" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white transition-colors mx-1.5 rounded-lg">
                       Profil Saya
+                    </Link>
+                    <Link to="/profil/edit" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white transition-colors mx-1.5 rounded-lg">
+                      Edit Profil
                     </Link>
                     <button
                       onClick={logout}
-                      className="px-4 py-2 text-sm text-left text-red-400 hover:bg-white/5 hover:text-red-300 transition-colors mx-1.5 rounded-lg"
+                      className="px-4 py-2 text-sm text-left text-red-500 hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-white/5 dark:hover:text-red-300 transition-colors mx-1.5 rounded-lg"
                     >
                       Logout
                     </button>
@@ -167,14 +182,14 @@ export default function Navbar() {
       {/* ── Search Overlay ── */}
       {searchOpen && (
         <div
-          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-24 px-4"
+          className="fixed inset-0 z-[60] bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-start justify-center pt-24 px-4"
           onClick={(e) => e.target === e.currentTarget && closeSearch()}
         >
-          <div className="w-full max-w-lg bg-[#101726] rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+          <div className="w-full max-w-lg bg-white dark:bg-[#101726] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden">
 
             {/* Input */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-              <Search className="h-5 w-5 text-slate-500 flex-shrink-0" />
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-white/10">
+              <Search className="h-5 w-5 text-gray-400 dark:text-slate-500 flex-shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -187,9 +202,9 @@ export default function Navbar() {
                   }
                 }}
                 placeholder="Cari judul, genre..."
-                className="flex-1 bg-transparent text-white text-sm placeholder:text-slate-600 focus:outline-none"
+                className="flex-1 bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none"
               />
-              <button onClick={closeSearch} className="text-slate-500 hover:text-white transition-colors">
+              <button onClick={closeSearch} className="text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-white transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -198,9 +213,9 @@ export default function Navbar() {
             {query.trim().length > 0 && (
               <div className="max-h-72 overflow-y-auto">
                 {searching ? (
-                  <div className="py-10 text-center text-sm text-slate-500">Mencari...</div>
+                  <div className="py-10 text-center text-sm text-gray-500 dark:text-slate-500">Mencari...</div>
                 ) : results.length === 0 ? (
-                  <div className="flex flex-col items-center gap-2 py-10 text-slate-600">
+                  <div className="flex flex-col items-center gap-2 py-10 text-gray-500 dark:text-slate-600">
                     <BookOpen className="h-7 w-7 opacity-40" />
                     <p className="text-sm">Tidak ada hasil untuk &ldquo;{query}&rdquo;</p>
                   </div>
@@ -209,12 +224,12 @@ export default function Navbar() {
                     <button
                       key={book.id}
                       onClick={() => handleResultClick(book.id)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left border-b border-white/5 last:border-0"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left border-b border-gray-100 dark:border-white/5 last:border-0"
                     >
                       <img src={assetUrl(book.cover)} alt={book.title} className="h-10 w-7 rounded-lg object-cover flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{book.title}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{book.genre} · ⭐ {book.rating}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{book.title}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">{book.genre} · ⭐ {book.rating}</p>
                       </div>
                     </button>
                   ))
@@ -224,7 +239,7 @@ export default function Navbar() {
 
             {/* Hint saat kosong */}
             {query.trim().length === 0 && (
-              <div className="px-4 py-4 text-xs text-slate-600">
+              <div className="px-4 py-4 text-xs text-gray-500 dark:text-slate-600">
                 Ketik judul atau genre untuk mulai mencari...
               </div>
             )}

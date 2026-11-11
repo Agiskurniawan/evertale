@@ -32,8 +32,8 @@ export default function KategoriDetail() {
   const books = data?.data ?? [];
 
   return (
-    <div className="min-h-screen bg-[#0B1220] pb-20">
-      <div className="border-b border-white/5 bg-[#0B1220]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0B1220] pb-20">
+      <div className="border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0B1220]">
         <div className="px-6 md:px-12 lg:px-16 overflow-x-auto">
           <div className="flex space-x-6 md:space-x-8">
             {(categories ?? []).map((category) => (
@@ -43,7 +43,7 @@ export default function KategoriDetail() {
                 className={`py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap border-b-2 transition-colors ${
                   activeId === category.id
                     ? "border-blue-500 text-blue-500"
-                    : "border-transparent text-slate-400 hover:text-white"
+                    : "border-transparent text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
                 {category.name}
@@ -55,9 +55,9 @@ export default function KategoriDetail() {
 
       <div className="px-6 md:px-12 lg:px-16 pt-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-          <div className="text-white text-sm font-bold">
-            {bookType && <span className="mr-2 font-normal text-slate-400 capitalize">{bookType} ·</span>}
-            {data?.meta.total ?? 0} <span className="text-slate-400 font-normal">serial</span>
+          <div className="text-gray-900 dark:text-white text-sm font-bold">
+            {bookType && <span className="mr-2 font-normal text-gray-500 dark:text-slate-400 capitalize">{bookType} ·</span>}
+            {data?.meta.total ?? 0} <span className="text-gray-500 dark:text-slate-400 font-normal">serial</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
@@ -66,13 +66,13 @@ export default function KategoriDetail() {
                 <button
                   onClick={() => setSortBy(option.key)}
                   className={`transition-colors ${
-                    sortBy === option.key ? "text-blue-500 font-medium" : "text-slate-400 hover:text-slate-300"
+                    sortBy === option.key ? "text-blue-500 font-medium" : "text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-300"
                   }`}
                 >
                   {option.label}
                 </button>
                 {index < sortOptions.length - 1 && (
-                  <span className="mx-2 text-white/20">|</span>
+                  <span className="mx-2 text-gray-300 dark:text-white/20">|</span>
                 )}
               </div>
             ))}

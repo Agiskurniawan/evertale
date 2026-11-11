@@ -2,6 +2,10 @@ import React, { createContext, useState, useContext, useEffect, useCallback } fr
 import { api, TOKEN_KEY } from "../lib/api";
 import type { User } from "../types";
 
+type ProfileUpdateInput =
+  | { username?: string; bio?: string | null; avatar_url?: string | null }
+  | string;
+
 type AuthContextType = {
   user: User | null;
   isLoggedIn: boolean;
@@ -10,10 +14,11 @@ type AuthContextType = {
   loading: boolean; // true selama token lama sedang dicek ke server
   username: string;
   bio: string;
+  avatarUrl: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  updateProfile: (username: string, bio: string) => Promise<void>;
+  updateProfile: (dataOrUsername: ProfileUpdateInput, maybeBio?: string) => Promise<void>;
   registerAsAuthor: () => Promise<void>;
 };
 
@@ -60,10 +65,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback(async (username: string, bio: string) => {
-    const res = await api.patch<{ user: User }>("/users/me", { username, bio });
-    setUser(res.data.user);
-  }, []);
+  const updateProfile = useCallback(
+    async (dataOrUsername: ProfileUpdateInput, maybeBio?: string) => {
+      const payload =
+        typeof dataOrUsername === "string"
+          ? { username: dataOrUsername, bio: maybeBio }
+          : dataOrUsername;
+      const res = await api.patch<{ user: User }>("/users/me", payload);
+      setUser(res.data.user);
+    },
+    []
+  );
 
   const registerAsAuthor = useCallback(async () => {
     const res = await api.post<{ user: User }>("/users/me/become-author");
@@ -80,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         username: user?.username ?? "Pembaca",
         bio: user?.bio ?? "",
+        avatarUrl: user?.avatar_url ?? null,
         login,
         register,
         logout,
