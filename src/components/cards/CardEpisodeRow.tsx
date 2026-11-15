@@ -73,6 +73,10 @@ export default function CardEpisodeRow({
           <img
             src={assetUrl(chapter.thumbnail_url)}
             alt={chapter.title}
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              img.style.display = 'none';
+            }}
             className="w-14 h-10 sm:w-16 sm:h-11 rounded-lg object-cover flex-shrink-0 border border-gray-200 dark:border-white/10"
           />
         ) : (

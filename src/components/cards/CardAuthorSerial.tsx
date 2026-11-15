@@ -14,6 +14,10 @@ export default function CardAuthorSerial({ serial }: CardAuthorSerialProps) {
         <img
           src={assetUrl(serial.cover)}
           alt={serial.title}
+          onError={(e) => {
+            const img = e.currentTarget as HTMLImageElement;
+            img.src = assetUrl(null);
+          }}
           className="h-full w-full rounded-xl object-cover border border-gray-200 dark:border-white/10"
         />
         <span
