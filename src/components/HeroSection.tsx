@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useFetch } from "../hooks/useFetch";
 import { api, assetUrl } from "../lib/api";
 import type { Book, BookList } from "../types";
@@ -71,7 +71,7 @@ export default function HeroSection() {
 
   if (loading) {
     return (
-      <section className="w-full min-h-[70vh] md:min-h-[80vh] bg-[#0B1220] animate-pulse" />
+      <section className="w-full h-[340px] sm:h-[400px] md:h-[480px] lg:h-[520px] bg-[#0B1220] animate-pulse" />
     );
   }
 
@@ -79,20 +79,19 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative w-full min-h-[72vh] md:min-h-[80vh] lg:min-h-[85vh] overflow-hidden bg-[#0B1220] select-none group/hero"
+      className="relative w-full h-[340px] sm:h-[400px] md:h-[480px] lg:h-[520px] overflow-hidden bg-[#0B1220] select-none group/hero"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ── Track Slider Horisontal (Bisa di-scroll / digeser untuk 10 trending karya) ── */}
+      {/* ── Track Slider Horisontal ── */}
       <div
-        className="flex w-full h-full transition-transform duration-600 ease-out"
+        className="flex w-full h-full transition-transform duration-500 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((book, slideIdx) => {
-          // Resolusi gambar: banner hero karya -> cover karya -> sample anime art Hinata
           const heroArt = book.banner
             ? assetUrl(book.banner)
             : book.cover
@@ -102,81 +101,78 @@ export default function HeroSection() {
           return (
             <div
               key={book.id || slideIdx}
-              className="w-full h-full flex-shrink-0 relative overflow-hidden flex items-center min-h-[72vh] md:min-h-[80vh] lg:min-h-[85vh]"
+              className="w-full h-full flex-shrink-0 relative overflow-hidden"
             >
-              {/* ── Artwork di Sisi Kanan dengan Gradasi Menghilang Halus ke Sisi Kiri ── */}
-              <div className="absolute right-0 top-0 bottom-0 w-full sm:w-4/5 md:w-3/5 lg:w-3/5 overflow-hidden pointer-events-none">
-                <img
-                  src={heroArt}
-                  alt={book.title}
-                  onError={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    if (img.src !== assetUrl(SAMPLE_HERO_ART)) {
-                      img.src = assetUrl(SAMPLE_HERO_ART);
-                    } else {
-                      img.src = assetUrl(FALLBACK_COVER);
-                    }
-                  }}
-                  className="w-full h-full object-cover object-right sm:object-center"
-                />
-                {/* Gradasi menyatu dengan latar belakang #0B1220 */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220] via-[#0B1220]/85 sm:via-[#0B1220]/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/60 sm:via-transparent to-transparent sm:hidden" />
+              {/* ── Gambar Penuh (Full-bleed cover) ── */}
+              <img
+                src={heroArt}
+                alt={book.title}
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  if (img.src !== assetUrl(SAMPLE_HERO_ART)) {
+                    img.src = assetUrl(SAMPLE_HERO_ART);
+                  } else {
+                    img.src = assetUrl(FALLBACK_COVER);
+                  }
+                }}
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
+
+              {/* ── Gradasi kiri ke kanan (agar teks terbaca) ── */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220] via-[#0B1220]/70 to-transparent" />
+
+              {/* ── Gradasi bawah ke atas (menyatu dengan halaman) ── */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/40 to-transparent" />
+
+              {/* ── Pil Tag Buku & Rating di Kiri Atas ── */}
+              <div className="absolute top-4 left-4 sm:top-5 sm:left-6 md:left-10 flex items-center gap-2 z-10">
+                {/* Tag: tipe buku (Novel/Komik) */}
+                <span className="px-2.5 py-1 rounded-md bg-blue-600 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-md">
+                  {book.type === "novel" ? "NOVEL" : "KOMIK"}
+                </span>
+                {/* Tag: genre */}
+                {(book.genre) && (
+                  <span className="px-2.5 py-1 rounded-md bg-[#101726]/80 backdrop-blur-sm text-blue-300 text-[10px] sm:text-xs font-semibold border border-blue-500/20">
+                    {book.genre.toUpperCase()}
+                  </span>
+                )}
+                {/* Rating */}
+                <span className="px-2.5 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white text-[10px] sm:text-xs font-semibold flex items-center gap-1 border border-white/10">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  {book.rating || "4.9"}
+                </span>
               </div>
 
-              {/* ── Konten Sisi Kiri (Sesuai Desain Asli di Screenshot) ── */}
-              <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 md:px-14 lg:px-16 py-12 md:py-16">
-                <div className="max-w-2xl flex flex-col justify-center">
-                  
-                  {/* Tag Atas: PILIHAN EDITOR / GENRE */}
-                  <p className="text-xs sm:text-sm font-bold tracking-widest text-blue-400 uppercase mb-3 sm:mb-4 flex items-center gap-2">
-                    <span>PILIHAN EDITOR</span>
-                    <span className="opacity-40">/</span>
-                    <span>{(book.genre || "FANTASI ROMANSA").toUpperCase()}</span>
-                  </p>
+              {/* ── Konten Teks & Tombol di Kiri Bawah ── */}
+              <div className="absolute bottom-0 left-0 right-0 z-10 px-4 sm:px-6 md:px-10 pb-5 sm:pb-7 md:pb-9">
 
-                  {/* Judul Besar */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mb-3 sm:mb-4 drop-shadow-md">
-                    {book.title}
-                  </h1>
+                {/* Judul Novel */}
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight mb-2 line-clamp-2 drop-shadow-md max-w-lg">
+                  {book.title}
+                </h1>
 
-                  {/* Sinopsis */}
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed line-clamp-2 sm:line-clamp-3 mb-6 sm:mb-8 max-w-xl">
-                    {book.synopsis || "Di antara ribuan bintang, ada satu kisah yang menunggu untuk ditemukan."}
-                  </p>
+                {/* Sinopsis (max 2 baris) */}
+                <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed line-clamp-2 max-w-[480px] mb-3 sm:mb-4 hidden sm:block">
+                  {book.synopsis || "Di antara ribuan bintang, ada satu kisah yang menunggu untuk ditemukan."}
+                </p>
 
-                  {/* Dua Tombol Aksi: Baca Sekarang & Lihat Detail */}
-                  <div className="flex items-center gap-3.5 mb-6 sm:mb-8 flex-wrap">
-                    <Link
-                      to={`/baca/${book.id}`}
-                      className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-sm sm:text-base shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center cursor-pointer"
-                    >
-                      Baca Sekarang
-                    </Link>
+                {/* Tombol Aksi */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  {/* Baca Sekarang - warna tema biru */}
+                  <Link
+                    to={`/baca/${book.id}`}
+                    className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition-all duration-150 hover:-translate-y-0.5"
+                  >
+                    <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>Baca Sekarang</span>
+                  </Link>
+                </div>
 
-                    <Link
-                      to={`/baca/${book.id}`}
-                      className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white font-semibold text-sm sm:text-base border border-white/20 backdrop-blur-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <span>Lihat Detail</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-
-                  {/* Baris Metadata: Rating, Pembaca, Tipe & Genre */}
-                  <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm text-slate-400 font-medium flex-wrap">
-                    <div className="flex items-center gap-1 text-amber-400 font-bold">
-                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                      <span className="text-white">{book.rating || "4.9"}</span>
-                    </div>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-slate-300">{book.readers || "128K"} pembaca</span>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-slate-300">
-                      {book.type === "novel" ? "Novel" : "Komik"} - {book.genre || "Fantasi"}
-                    </span>
-                  </div>
-
+                {/* Metadata kecil: pembaca & tipe */}
+                <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-400 font-medium">
+                  <span>{book.readers || "128K"} pembaca</span>
+                  <span className="opacity-40">•</span>
+                  <span>{book.type === "novel" ? "Novel" : "Komik"} - {book.genre || "Fantasi"}</span>
                 </div>
               </div>
             </div>
@@ -184,9 +180,9 @@ export default function HeroSection() {
         })}
       </div>
 
-      {/* ── Indikator Slide di Pojok Kanan Bawah (Sesuai Screenshot: [--] . .) ── */}
+      {/* ── Indikator Slide (bawah tengah) ── */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-14 flex items-center gap-1.5 z-20">
+        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
           {slides.map((s, i) => (
             <button
               key={s.id || i}
@@ -195,32 +191,32 @@ export default function HeroSection() {
               onClick={() => setIndex(i)}
               className={`transition-all duration-300 rounded-full cursor-pointer ${
                 i === index
-                  ? "w-8 sm:w-10 h-1 sm:h-1.5 bg-blue-500 shadow-sm shadow-blue-500/50"
-                  : "w-1.5 sm:w-2 h-1 sm:h-1.5 bg-white/30 hover:bg-white/60"
+                  ? "w-6 sm:w-7 h-1.5 bg-blue-500 shadow-sm shadow-blue-500/50"
+                  : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
               }`}
             />
           ))}
         </div>
       )}
 
-      {/* ── Tombol Panah Navigasi Samping Desktop (Muncul saat Hover) ── */}
+      {/* ── Tombol Panah (muncul saat hover desktop) ── */}
       {slides.length > 1 && (
         <>
           <button
             type="button"
             aria-label="Slide sebelumnya"
             onClick={handlePrev}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl opacity-0 group-hover/hero:opacity-100 transition-all active:scale-90 cursor-pointer"
+            className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg opacity-0 group-hover/hero:opacity-100 transition-all active:scale-90 cursor-pointer"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             type="button"
             aria-label="Slide berikutnya"
             onClick={handleNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 h-11 w-11 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl opacity-0 group-hover/hero:opacity-100 transition-all active:scale-90 cursor-pointer"
+            className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg opacity-0 group-hover/hero:opacity-100 transition-all active:scale-90 cursor-pointer"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </>
       )}
