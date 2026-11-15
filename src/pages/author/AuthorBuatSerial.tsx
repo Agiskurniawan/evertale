@@ -103,6 +103,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
       if (thumbVertikalFile) bannerUrl = await uploadFile(thumbVertikalFile, "banner");
       if (thumbHeroFile) heroUrl = await uploadFile(thumbHeroFile, "banner");
 
+      const finalCover = coverUrl || bannerUrl || heroUrl;
+      const finalBanner = heroUrl || bannerUrl || coverUrl;
+
       // Cari category_ids dari nama
       const catIds = categories
         .filter((c) => [kategori1, kategori2].includes(c.name))
@@ -114,8 +117,8 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
         synopsis: ringkasan.trim() || null,
         language: bahasa,
         story_status: statusCerita,
-        cover_url: coverUrl,
-        banner_url: heroUrl ?? bannerUrl,
+        cover_url: finalCover,
+        banner_url: finalBanner,
         category_ids: catIds,
       });
 
@@ -385,19 +388,19 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                   </span>
                 </div>
 
-                {/* 3. Slot Banner Hero Section (Landscape 16:9) */}
+                {/* 3. Slot Banner Hero Section */}
                 <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                     <Check className="h-3.5 w-3.5" />
-                    <span>Banner Hero (16:9)</span>
+                    <span>Banner Hero Beranda</span>
                   </div>
-                  <span className="text-[11px] text-gray-500 dark:text-slate-400 font-mono">
-                    1920 × 1080 px
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
+                    1920 × 520 px (Pas) / 1920 × 1080 px
                   </span>
 
                   <ThumbBox
                     preview={thumbHero}
-                    label="1920 x 1080"
+                    label="1920 x 520 px (Ideal)"
                     boxClass="w-64 h-36 sm:w-80 sm:h-44"
                     onClick={() => inputHeroRef.current?.click()}
                     onRemove={() => {
@@ -414,7 +417,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                     onChange={(e) => handleThumb(e, setThumbHero, setThumbHeroFile)}
                   />
                   <span className="text-[11px] text-gray-500 dark:text-slate-500 text-center max-w-[240px]">
-                    Digunakan untuk hero section beranda (gambar seni / artwork landscape)
+                    Ukuran pas hero: 1920 × 520 px. Jika rasio berbeda, sistem memotong (crop) otomatis secara proporsional.
                   </span>
                 </div>
 

@@ -347,8 +347,8 @@ function EditSerialForm({
         language: bahasaSumber,
         story_status: statusPenerbitan,
         update_day: updateDay || null,
-        cover_url: thumbPersegiUrl,
-        banner_url: thumbHeroUrl ?? thumbVertikalUrl,
+        cover_url: thumbPersegiUrl || thumbVertikalUrl || thumbHeroUrl,
+        banner_url: thumbHeroUrl || thumbVertikalUrl || thumbPersegiUrl,
         category_ids: catIds,
       });
 
@@ -659,10 +659,10 @@ function EditSerialForm({
                   />
                 </div>
 
-                {/* 3. Banner Hero Section (Landscape 16:9) */}
+                {/* 3. Banner Hero Section */}
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    Banner Hero (16:9)
+                    Banner Hero Beranda
                   </span>
                   <div className="w-[200px] h-[112px] sm:w-[240px] sm:h-[135px] rounded-xl bg-gray-100 dark:bg-[#0B1220] border-2 border-dashed border-gray-300 dark:border-white/15 relative overflow-hidden flex flex-col items-center justify-center group hover:border-emerald-500/50 transition-colors">
                     {thumbHeroUrl ? (
@@ -702,7 +702,7 @@ function EditSerialForm({
                           <Upload className="h-5 w-5 text-emerald-400" />
                         )}
                         <span className="text-[11px] font-medium">Unggah Foto</span>
-                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">1920 × 1080 px</span>
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold">1920 × 520 px (Ideal)</span>
                       </button>
                     )}
                   </div>
@@ -714,7 +714,7 @@ function EditSerialForm({
                     onChange={handleUploadHero}
                   />
                   <span className="text-[10px] text-gray-400 dark:text-slate-500 text-center max-w-[240px]">
-                    Artwork landscape untuk hero section beranda
+                    Ukuran pas hero: 1920 × 520 px. Jika rasio berbeda, sistem crop otomatis.
                   </span>
                 </div>
               </div>
