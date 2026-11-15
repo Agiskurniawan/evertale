@@ -12,7 +12,7 @@ export default function Buku() {
     const books = data?.data ?? [];
 
     return (
-    <section className="min-h-screen w-full bg-white dark:bg-[#080D18] py-16 md:py-20">
+    <section className="w-full bg-[#DFE3E8] pt-24 md:pt-32 pb-16 md:pb-20 transition-colors duration-300 dark:bg-[#080D18]">
     <div className="w-full px-6 md:px-12 lg:px-16">
         <div className="mb-10">
             <div className="flex items-center gap-3 text-xs font-bold tracking-[0.15em] text-blue-500 dark:text-blue-400 uppercase">
