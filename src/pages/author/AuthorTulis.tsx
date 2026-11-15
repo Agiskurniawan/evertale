@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
@@ -11,13 +11,10 @@ import {
   AlertCircle,
   Check,
   Loader2,
-  FileText,
 } from "lucide-react";
 import DataState from "../../components/DataState";
 import AuthorSidebar from "../../components/author/AuthorSidebar";
 import ModalPreviewEpisode from "../../components/modals/ModalPreviewEpisode";
-import ModalClipStudio from "../../components/modals/ModalClipStudio";
-import ModalPedomanKonten from "../../components/modals/ModalPedomanKonten";
 import { useAuth } from "../../context/AuthContext";
 import { useFetch } from "../../hooks/useFetch";
 import { api, assetUrl, errorMessage } from "../../lib/api";
@@ -55,6 +52,18 @@ export default function AuthorTulis() {
   const loading = serial.loading || episode.loading;
   const error = serial.error || episode.error;
   if (loading || error) return <DataState loading={loading} error={error} />;
+
+  // Jika karya bertipe novel, otomatis alihkan ke halaman editor naskah novel baru
+  if (serial.data?.type === "novel") {
+    return (
+      <Navigate
+        to={`/author/novel-editor?serial=${serialId || ""}${
+          episodeId ? `&chapter=${episodeId}` : ""
+        }`}
+        replace
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
@@ -98,11 +107,20 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
     episode?.thumbnail_url ?? ""
   );
   const [pages, setPages] = useState<string[]>(episode?.pages ?? []);
-  const [novelContent, setNovelContent] = useState<string>(episode?.content ?? "");
   const [creatorNote, setCreatorNote] = useState<string>("");
   const [allowComments, setAllowComments] = useState<boolean>(true);
   const [publishMode, setPublishMode] = useState<"segera" | "jadwalkan">("segera");
   const [scheduledDate, setScheduledDate] = useState<string>("");
+
+  // Sync saat data episode selesai dimuat dari backend
+  useEffect(() => {
+    if (episode) {
+      if (episode.chapter_number) setChapterNumber(episode.chapter_number);
+      if (episode.title) setChapterTitle(episode.title);
+      if (episode.thumbnail_url) setThumbnailUrl(episode.thumbnail_url);
+      if (episode.pages) setPages(episode.pages);
+    }
+  }, [episode]);
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -113,13 +131,9 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
 
   // Modals state
   const [previewModal, setPreviewModal] = useState<"pc" | "mobile" | null>(null);
-  const [clipStudioModal, setClipStudioModal] = useState(false);
-  const [proTipsModal, setProTipsModal] = useState(false);
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const isComic = serial?.type === "komik";
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -202,10 +216,14 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
     }
   };
 
-  // Simpan / Terbitkan Episode
+  // Simpan / Terbitkan Episode Komik
   const handleSubmit = async (publish: boolean) => {
     if (!chapterTitle.trim()) {
       setErrorMsg("Silakan masukkan judul episode.");
+      return;
+    }
+    if (pages.length === 0) {
+      setErrorMsg("Silakan unggah minimal satu gambar halaman komik.");
       return;
     }
     if (!serialId) {
@@ -217,11 +235,15 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
       setSaving(true);
       setErrorMsg("");
 
+      // Gunakan thumbnail manual, atau fallback ke gambar halaman pertama
+      const finalThumb =
+        thumbnailUrl.trim() || (pages.length > 0 ? pages[0] : null);
+
       const payload = {
         chapter_number: Number(chapterNumber) || 1,
         title: chapterTitle.trim(),
-        content: novelContent || null,
-        thumbnail_url: thumbnailUrl || null,
+        content: null,
+        thumbnail_url: finalThumb,
         pages: pages.length > 0 ? pages : undefined,
         is_published: publish,
       };
@@ -416,12 +438,12 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
           </div>
         </div>
 
-        {/* Upload File / Halaman Komik */}
+        {/* Upload File / Halaman Gambar Komik */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start border-t border-gray-100 dark:border-white/5 pt-6">
           <label className="flex items-center gap-1.5 text-sm font-bold text-gray-900 dark:text-white pt-2">
             <span>Pilih File</span>
             <span
-              title="Unggah halaman gambar komik atau naskah tulisan"
+              title="Unggah halaman gambar komik"
               className="text-gray-400 dark:text-slate-400 cursor-help"
             >
               <Info className="h-3.5 w-3.5" />
@@ -451,14 +473,6 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
                     <Upload className="h-3.5 w-3.5" />
                   )}
                   <span>Pilih file untuk diunggah</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setClipStudioModal(true)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#0B1220] hover:bg-gray-200 dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white text-xs font-medium transition-colors"
-                >
-                  Impor dari Clip Studio Paint
                 </button>
 
                 <button
@@ -533,57 +547,31 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
               )}
             </div>
 
+            {/* Deskripsi upload — berubah otomatis sesuai kondisi */}
             <div className="text-[11px] text-gray-500 dark:text-slate-500 space-y-0.5 leading-relaxed">
-              <p>
-                • Sistem akan memotong dan mengurangi ukuran gambar yang melebihi dimensi maksimal 800x1280px secara otomatis.
-              </p>
-              <p>
-                • Gambar yang melebihi dimensi maksimal dapat dioptimalkan dengan berbagai cara.
-              </p>
-              <p>
-                • Ukuran file maksimal untuk semua gambar adalah 2MB. Anda dapat mengunggah hingga 50MB, total 100 gambar.
-              </p>
-              <p>• Hanya format JPG, JPEG, PNG yang didukung.</p>
+              {uploadingPages ? (
+                /* Saat sedang upload */
+                <p className="text-blue-500 dark:text-blue-400 font-medium animate-pulse">
+                  ⏳ Sedang mengunggah gambar, harap tunggu...
+                </p>
+              ) : pages.length > 0 ? (
+                /* Setelah ada file yang masuk */
+                <>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                    ✓ {pages.length} gambar berhasil diunggah dan siap diterbitkan.
+                  </p>
+                  <p>• Anda dapat menghapus gambar tertentu dengan hover lalu klik ikon tempat sampah.</p>
+                  <p>• Tambah gambar lagi lewat tombol "Pilih file untuk diunggah" di atas.</p>
+                </>
+              ) : (
+                /* Kondisi awal / belum ada file */
+                <>
+                  <p>• Sistem akan memotong gambar yang melebihi dimensi maksimal 800×1280px secara otomatis.</p>
+                  <p>• Ukuran file maksimal per gambar adalah 2 MB. Total unggahan maksimal 50 MB (100 gambar).</p>
+                  <p>• Hanya format JPG, JPEG, dan PNG yang didukung.</p>
+                </>
+              )}
             </div>
-
-            {/* Naskah / Teks Cerita */}
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-slate-300">
-                  <FileText className="h-3.5 w-3.5 text-blue-400" />
-                  <span>Isi Cerita / Teks Episode {isComic ? "(Opsional)" : ""}</span>
-                </label>
-                <span className="text-[11px] text-gray-500 dark:text-slate-500">
-                  {novelContent.trim()
-                    ? `${novelContent.trim().split(/\s+/).length} kata`
-                    : "0 kata"}
-                </span>
-              </div>
-              <textarea
-                rows={6}
-                value={novelContent}
-                onChange={(e) => setNovelContent(e.target.value)}
-                placeholder="Tuliskan naskah atau cerita episode di sini..."
-                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl p-4 text-gray-900 dark:text-white text-xs leading-relaxed placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-y"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Tips PRO */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start border-t border-gray-100 dark:border-white/5 pt-6">
-          <label className="text-sm font-bold text-gray-900 dark:text-white pt-1">Tips PRO</label>
-          <div className="md:col-span-3 text-xs text-gray-600 dark:text-slate-400 leading-relaxed">
-            <span>
-              Ketelanjangan, konten seksual eksplisit, kekerasan yang tidak perlu, konten yang kasar atau berbahaya, dan pelanggaran hak cipta atau merek dagang apa pun tidak diperbolehkan.{" "}
-            </span>
-            <button
-              type="button"
-              onClick={() => setProTipsModal(true)}
-              className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 font-semibold underline underline-offset-2 ml-1"
-            >
-              Detail Selengkapnya
-            </button>
           </div>
         </div>
 
@@ -744,17 +732,9 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
           chapterNumber={chapterNumber}
           chapterTitle={chapterTitle}
           pages={pages}
-          novelContent={novelContent}
+          novelContent=""
           creatorNote={creatorNote}
         />
-      )}
-
-      {clipStudioModal && (
-        <ModalClipStudio onClose={() => setClipStudioModal(false)} />
-      )}
-
-      {proTipsModal && (
-        <ModalPedomanKonten onClose={() => setProTipsModal(false)} />
       )}
     </div>
   );

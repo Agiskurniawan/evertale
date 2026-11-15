@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, Navigate, useParams, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
@@ -131,11 +131,16 @@ function EditSerialForm({
     serial.cover || null
   );
   const [thumbVertikalUrl, setThumbVertikalUrl] = useState<string | null>(null);
+  const [thumbHeroUrl, setThumbHeroUrl] = useState<string | null>(
+    serial.banner || null
+  );
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
 
   const filePersegiRef = useRef<HTMLInputElement>(null);
   const fileVertikalRef = useRef<HTMLInputElement>(null);
+  const fileHeroRef = useRef<HTMLInputElement>(null);
 
   // Status submission
   const [saving, setSaving] = useState(false);
@@ -143,9 +148,91 @@ function EditSerialForm({
   const [errorMsg, setErrorMsg] = useState("");
   const [toastMsg, setToastMsg] = useState("");
 
+  const isNovel = serial.type === "novel";
+  const [chaptersList, setChaptersList] = useState(serial.chapters || []);
+  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    setChaptersList(serial.chapters || []);
+  }, [serial.chapters]);
+
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 3500);
+  };
+
+  // Reorder API call (Drag and Drop)
+  const handleReorder = async (newList: typeof serial.chapters) => {
+    setChaptersList(newList);
+    try {
+      await api.put(`/author/books/${serial.id}/chapters/reorder`, {
+        chapter_ids: newList.map((c) => c.id),
+      });
+      showToast(
+        isNovel
+          ? "Urutan bab berhasil diperbarui!"
+          : "Urutan episode berhasil diperbarui!"
+      );
+      onReload();
+    } catch (err) {
+      showToast(errorMessage(err, "Gagal memperbarui urutan bab"));
+      setChaptersList(serial.chapters || []);
+    }
+  };
+
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    setDraggedIdx(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (
+    e: React.DragEvent<HTMLDivElement>,
+    _index: number
+  ) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetIdx: number
+  ) => {
+    e.preventDefault();
+    if (draggedIdx === null || draggedIdx === targetIdx) {
+      setDraggedIdx(null);
+      return;
+    }
+    const updated = [...chaptersList];
+    const [movedItem] = updated.splice(draggedIdx, 1);
+    updated.splice(targetIdx, 0, movedItem);
+
+    // Update nomor bab secara lokal
+    const renumbered = updated.map((item, idx) => ({ ...item, no: idx + 1 }));
+    setDraggedIdx(null);
+    handleReorder(renumbered);
+  };
+
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    const updated = [...chaptersList];
+    const temp = updated[index];
+    updated[index] = updated[index - 1];
+    updated[index - 1] = temp;
+    const renumbered = updated.map((item, idx) => ({ ...item, no: idx + 1 }));
+    handleReorder(renumbered);
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (index === chaptersList.length - 1) return;
+    const updated = [...chaptersList];
+    const temp = updated[index];
+    updated[index] = updated[index + 1];
+    updated[index + 1] = temp;
+    const renumbered = updated.map((item, idx) => ({ ...item, no: idx + 1 }));
+    handleReorder(renumbered);
   };
 
   // Upload Thumbnail Persegi (Cover Utama)
@@ -174,7 +261,7 @@ function EditSerialForm({
     }
   };
 
-  // Upload Thumbnail Vertikal (Banner)
+  // Upload Thumbnail Vertikal (Banner / Cover 9:16)
   const handleUploadVertikal = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -197,6 +284,32 @@ function EditSerialForm({
     } finally {
       setUploadingBanner(false);
       if (fileVertikalRef.current) fileVertikalRef.current.value = "";
+    }
+  };
+
+  // Upload Banner Hero Section (Landscape 16:9)
+  const handleUploadHero = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran file maksimal 5 MB.");
+      return;
+    }
+    try {
+      setUploadingHero(true);
+      setErrorMsg("");
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await api.post<{ url: string }>("/upload?type=banner", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setThumbHeroUrl(res.data.url);
+      showToast("Banner hero berhasil diunggah!");
+    } catch (err) {
+      setErrorMsg(errorMessage(err, "Gagal mengunggah banner hero."));
+    } finally {
+      setUploadingHero(false);
+      if (fileHeroRef.current) fileHeroRef.current.value = "";
     }
   };
 
@@ -235,7 +348,7 @@ function EditSerialForm({
         story_status: statusPenerbitan,
         update_day: updateDay || null,
         cover_url: thumbPersegiUrl,
-        banner_url: thumbVertikalUrl,
+        banner_url: thumbHeroUrl ?? thumbVertikalUrl,
         category_ids: catIds,
       });
 
@@ -327,8 +440,8 @@ function EditSerialForm({
                 }
                 className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
               >
-                <option value="ongoing">Sedang Berlangsung</option>
-                <option value="selesai">Tamat / Selesai</option>
+                <option value="ongoing">Berjalan (Ongoing)</option>
+                <option value="selesai">Tamat (Selesai)</option>
               </select>
             </div>
           </div>
@@ -545,13 +658,72 @@ function EditSerialForm({
                     onChange={handleUploadVertikal}
                   />
                 </div>
+
+                {/* 3. Banner Hero Section (Landscape 16:9) */}
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    Banner Hero (16:9)
+                  </span>
+                  <div className="w-[200px] h-[112px] sm:w-[240px] sm:h-[135px] rounded-xl bg-gray-100 dark:bg-[#0B1220] border-2 border-dashed border-gray-300 dark:border-white/15 relative overflow-hidden flex flex-col items-center justify-center group hover:border-emerald-500/50 transition-colors">
+                    {thumbHeroUrl ? (
+                      <>
+                        <img
+                          src={assetUrl(thumbHeroUrl)}
+                          alt="Banner Hero"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileHeroRef.current?.click()}
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+                          >
+                            Ganti
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setThumbHeroUrl(null)}
+                            className="p-1.5 rounded-lg bg-red-500/80 hover:bg-red-500 text-white"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={uploadingHero}
+                        onClick={() => fileHeroRef.current?.click()}
+                        className="flex flex-col items-center gap-1.5 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white p-2 transition-colors disabled:opacity-50"
+                      >
+                        {uploadingHero ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Upload className="h-5 w-5 text-emerald-400" />
+                        )}
+                        <span className="text-[11px] font-medium">Unggah Foto</span>
+                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">1920 × 1080 px</span>
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={fileHeroRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    className="hidden"
+                    onChange={handleUploadHero}
+                  />
+                  <span className="text-[10px] text-gray-400 dark:text-slate-500 text-center max-w-[240px]">
+                    Artwork landscape untuk hero section beranda
+                  </span>
+                </div>
               </div>
 
               <div className="text-[11px] text-gray-400 dark:text-slate-500 space-y-0.5 leading-relaxed pt-1">
                 <p>
-                  • Ukuran gambar harus 1080x1080, 1080x1920. Besar file gambar harus kurang dari 500KB.
+                  • Thumbnail Persegi 1080×1080px · Vertikal 1080×1920px · Banner Hero 1920×1080px.
                 </p>
-                <p>• Hanya format JPG, JPEG, dan PNG yang diperbolehkan.</p>
+                <p>• Hanya format JPG, JPEG, PNG, dan WebP yang diperbolehkan. Maks 2 MB (Banner Hero maks 5 MB).</p>
               </div>
             </div>
           </div>
@@ -597,36 +769,59 @@ function EditSerialForm({
         </div>
       </form>
 
-      {/* ─── KARTU 4: Kelola Daftar Episode (Memakai CardEpisodeRow) ─────────── */}
+      {/* ─── KARTU 4: Kelola Daftar Bab / Episode ─────────── */}
       <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-6 flex flex-col gap-4 shadow-lg w-full mt-4">
         <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-200 dark:border-white/10">
           <div>
-            <h2 className="text-base font-bold text-gray-900 dark:text-white">Daftar Episode</h2>
+            <h2 className="text-base font-bold text-gray-900 dark:text-white">
+              {isNovel ? "Daftar Bab Novel" : "Daftar Episode Komik"}
+            </h2>
             <p className="text-xs text-gray-500 dark:text-slate-500">
-              Total {serial.chapters.length} episode dalam serial ini.
+              Total {chaptersList.length} {isNovel ? "bab" : "episode"} dalam karya ini.{" "}
+              {chaptersList.length > 1 && (
+                <span className="text-blue-500 dark:text-blue-400 font-medium">
+                  Tahan & geser (drag & drop) untuk mengurutkan ulang.
+                </span>
+              )}
             </p>
           </div>
 
           <Link
-            to={`/author/tulis?serial=${serial.id}`}
+            to={
+              isNovel
+                ? `/author/novel-editor?serial=${serial.id}`
+                : `/author/tulis?serial=${serial.id}`
+            }
             className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-1.5"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>Tambah Episode</span>
+            <span>{isNovel ? "Tambah Bab" : "Tambah Episode"}</span>
           </Link>
         </div>
 
-        {serial.chapters.length === 0 ? (
+        {chaptersList.length === 0 ? (
           <div className="py-12 text-center text-gray-400 dark:text-slate-500 text-xs">
-            Belum ada episode yang ditulis. Klik "Tambah Episode" untuk mulai menulis!
+            Belum ada {isNovel ? "bab" : "episode"} yang ditulis. Klik "
+            {isNovel ? "Tambah Bab" : "Tambah Episode"}" untuk mulai menulis!
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-white/5">
-            {serial.chapters.map((chapter) => (
+            {chaptersList.map((chapter, index) => (
               <CardEpisodeRow
                 key={chapter.id}
                 serialId={serial.id}
                 chapter={chapter}
+                index={index}
+                total={chaptersList.length}
+                isNovel={isNovel}
+                draggable={chaptersList.length > 1}
+                isDragging={draggedIdx === index}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragEnd={() => setDraggedIdx(null)}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
                 onDelete={handleDeleteChapter}
               />
             ))}

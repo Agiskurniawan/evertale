@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { ChevronRight, Upload } from "lucide-react";
+import { ChevronRight, Upload, Trash2, Camera, Check } from "lucide-react";
 import AuthorSidebar from "../../components/author/AuthorSidebar";
 import { useAuth } from "../../context/AuthContext";
 import { useFetch } from "../../hooks/useFetch";
@@ -33,16 +33,20 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
   const navigate = useNavigate();
   const [bahasa, setBahasa] = useState("Bahasa Indonesia");
   const [tipe, setTipe] = useState<"novel" | "komik">("novel");
+  const [statusCerita, setStatusCerita] = useState<"ongoing" | "selesai">("ongoing");
   const [judul, setJudul] = useState("");
   const [ringkasan, setRingkasan] = useState("");
   const [kategori1, setKategori1] = useState("Pilih");
   const [kategori2, setKategori2] = useState("");
   const [thumbPersegi, setThumbPersegi] = useState<string | null>(null);
   const [thumbVertikal, setThumbVertikal] = useState<string | null>(null);
+  const [thumbHero, setThumbHero] = useState<string | null>(null);
   const [thumbPersegiFile, setThumbPersegiFile] = useState<File | null>(null);
   const [thumbVertikalFile, setThumbVertikalFile] = useState<File | null>(null);
+  const [thumbHeroFile, setThumbHeroFile] = useState<File | null>(null);
   const inputPersegiRef = useRef<HTMLInputElement>(null);
   const inputVertikalRef = useRef<HTMLInputElement>(null);
+  const inputHeroRef = useRef<HTMLInputElement>(null);
 
   // submit state
   const [submitting, setSubmitting] = useState(false);
@@ -94,8 +98,10 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
       // Upload thumbnail jika ada
       let coverUrl: string | null = null;
       let bannerUrl: string | null = null;
+      let heroUrl: string | null = null;
       if (thumbPersegiFile) coverUrl = await uploadFile(thumbPersegiFile, "cover");
       if (thumbVertikalFile) bannerUrl = await uploadFile(thumbVertikalFile, "banner");
+      if (thumbHeroFile) heroUrl = await uploadFile(thumbHeroFile, "banner");
 
       // Cari category_ids dari nama
       const catIds = categories
@@ -107,8 +113,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
         type: tipe,
         synopsis: ringkasan.trim() || null,
         language: bahasa,
+        story_status: statusCerita,
         cover_url: coverUrl,
-        banner_url: bannerUrl,
+        banner_url: heroUrl ?? bannerUrl,
         category_ids: catIds,
       });
 
@@ -200,7 +207,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
           <FormRow label="Bahasa Sumber">
             <SelectField value={bahasa} onChange={setBahasa}>
               {BAHASA_OPTIONS.map((b) => (
-                <option key={b} value={b} className="bg-[#0D1526]">{b}</option>
+                <option key={b} value={b} className="bg-white dark:bg-[#0D1526] text-gray-900 dark:text-white">
+                  {b}
+                </option>
               ))}
             </SelectField>
           </FormRow>
@@ -215,9 +224,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                 maxLength={50}
                 onChange={(e) => setJudul(e.target.value)}
                 placeholder="Masukkan Judul Serial"
-                className="w-full bg-[#0D1526] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors pr-14"
+                className="w-full bg-gray-50 dark:bg-[#0D1526] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors pr-14"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-slate-500">
                 {judul.length}/50
               </span>
             </div>
@@ -233,9 +242,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                 onChange={(e) => setRingkasan(e.target.value)}
                 placeholder="Masukkan Ringkasan Serial"
                 rows={6}
-                className="w-full bg-[#0D1526] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                className="w-full bg-gray-50 dark:bg-[#0D1526] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
               />
-              <span className="absolute right-4 bottom-3 text-xs text-slate-500">
+              <span className="absolute right-4 bottom-3 text-xs text-gray-400 dark:text-slate-500">
                 {ringkasan.length}/500
               </span>
             </div>
@@ -246,72 +255,178 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
             <div className="flex gap-3">
               <SelectField value={kategori1} onChange={setKategori1}>
                 {KATEGORI_OPTIONS.map((k) => (
-                  <option key={k} value={k} className="bg-[#0D1526]">{k}</option>
+                  <option key={k} value={k} className="bg-white dark:bg-[#0D1526] text-gray-900 dark:text-white">
+                    {k}
+                  </option>
                 ))}
               </SelectField>
               <SelectField value={kategori2} onChange={setKategori2}>
-                <option value="" className="bg-[#0D1526]">Pilih (Opsi)</option>
+                <option value="" className="bg-white dark:bg-[#0D1526] text-gray-900 dark:text-white">
+                  Pilih (Opsi)
+                </option>
                 {catNames.filter((k) => k !== kategori1).map((k) => (
-                  <option key={k} value={k} className="bg-[#0D1526]">{k}</option>
+                  <option key={k} value={k} className="bg-white dark:bg-[#0D1526] text-gray-900 dark:text-white">
+                    {k}
+                  </option>
                 ))}
               </SelectField>
+            </div>
+          </FormRow>
+
+          {/* Status Cerita */}
+          <FormRow label="Status Cerita">
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300 font-medium cursor-pointer">
+                <input
+                  type="radio"
+                  name="story_status"
+                  value="ongoing"
+                  checked={statusCerita === "ongoing"}
+                  onChange={() => setStatusCerita("ongoing")}
+                  className="accent-blue-500 h-4 w-4"
+                />
+                <span>Berjalan (Ongoing)</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300 font-medium cursor-pointer">
+                <input
+                  type="radio"
+                  name="story_status"
+                  value="selesai"
+                  checked={statusCerita === "selesai"}
+                  onChange={() => setStatusCerita("selesai")}
+                  className="accent-blue-500 h-4 w-4"
+                />
+                <span>Tamat (Selesai)</span>
+              </label>
             </div>
           </FormRow>
         </section>
 
         {/* ── Card: Thumbnail ── */}
         <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#101726] p-6 mb-5">
-          <div className="flex items-start gap-6">
-            <span className="w-36 flex-shrink-0 text-sm font-semibold text-gray-700 dark:text-slate-200 pt-1">
-              Thumbnail
-              <sup className="ml-0.5 text-gray-400 dark:text-slate-500 font-normal text-[10px]">ⓘ</sup>
-            </span>
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="w-full md:w-36 flex-shrink-0">
+              <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1">
+                Thumbnail
+                <span className="text-gray-400 dark:text-slate-500 font-normal text-xs" title="Cover serial yang tampil di beranda dan daftar karya">ⓘ</span>
+              </span>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                Unggah cover untuk menarik perhatian pembaca.
+              </p>
+            </div>
 
-            <div className="flex-1">
-              {/* Label kolom */}
-              <div className="flex gap-6 mb-3">
-                <span className="flex-1 text-center text-sm font-semibold text-blue-400">Persegi</span>
-                <span className="flex-1 text-center text-sm font-semibold text-blue-400">Vertikal</span>
+            <div className="flex-1 w-full">
+              {/* Kolom Upload Thumbnail Bersebelahan & Rapi */}
+              <div className="flex flex-col sm:flex-row items-start gap-8">
+                
+                {/* 1. Slot Thumbnail Persegi (1:1) */}
+                <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400">
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Thumbnail Persegi (1:1)</span>
+                  </div>
+                  <span className="text-[11px] text-gray-500 dark:text-slate-400 font-mono">
+                    1080 × 1080 px
+                  </span>
+
+                  <ThumbBox
+                    preview={thumbPersegi}
+                    label="1080 x 1080"
+                    boxClass="w-48 h-48 sm:w-52 sm:h-52 aspect-square"
+                    onClick={() => inputPersegiRef.current?.click()}
+                    onRemove={() => {
+                      setThumbPersegi(null);
+                      setThumbPersegiFile(null);
+                      if (inputPersegiRef.current) inputPersegiRef.current.value = "";
+                    }}
+                  />
+                  <input
+                    ref={inputPersegiRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    className="hidden"
+                    onChange={(e) => handleThumb(e, setThumbPersegi, setThumbPersegiFile)}
+                  />
+                  <span className="text-[11px] text-gray-500 dark:text-slate-500 text-center max-w-[210px]">
+                    Digunakan untuk beranda, hero section trending, &amp; kartu buku
+                  </span>
+                </div>
+
+                {/* 2. Slot Cover Vertikal (9:16) */}
+                <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Cover Vertikal / Kartu</span>
+                  </div>
+                  <span className="text-[11px] text-gray-500 dark:text-slate-400 font-mono">
+                    1080 × 1920 px
+                  </span>
+
+                  <ThumbBox
+                    preview={thumbVertikal}
+                    label="1080 x 1920"
+                    boxClass="w-48 h-64 sm:w-52 sm:h-72"
+                    onClick={() => inputVertikalRef.current?.click()}
+                    onRemove={() => {
+                      setThumbVertikal(null);
+                      setThumbVertikalFile(null);
+                      if (inputVertikalRef.current) inputVertikalRef.current.value = "";
+                    }}
+                  />
+                  <input
+                    ref={inputVertikalRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    className="hidden"
+                    onChange={(e) => handleThumb(e, setThumbVertikal, setThumbVertikalFile)}
+                  />
+                  <span className="text-[11px] text-gray-500 dark:text-slate-500 text-center max-w-[210px]">
+                    Digunakan untuk banner halaman baca &amp; detail serial
+                  </span>
+                </div>
+
+                {/* 3. Slot Banner Hero Section (Landscape 16:9) */}
+                <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Banner Hero (16:9)</span>
+                  </div>
+                  <span className="text-[11px] text-gray-500 dark:text-slate-400 font-mono">
+                    1920 × 1080 px
+                  </span>
+
+                  <ThumbBox
+                    preview={thumbHero}
+                    label="1920 x 1080"
+                    boxClass="w-64 h-36 sm:w-80 sm:h-44"
+                    onClick={() => inputHeroRef.current?.click()}
+                    onRemove={() => {
+                      setThumbHero(null);
+                      setThumbHeroFile(null);
+                      if (inputHeroRef.current) inputHeroRef.current.value = "";
+                    }}
+                  />
+                  <input
+                    ref={inputHeroRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    className="hidden"
+                    onChange={(e) => handleThumb(e, setThumbHero, setThumbHeroFile)}
+                  />
+                  <span className="text-[11px] text-gray-500 dark:text-slate-500 text-center max-w-[240px]">
+                    Digunakan untuk hero section beranda (gambar seni / artwork landscape)
+                  </span>
+                </div>
+
               </div>
 
-              {/* Upload boxes */}
-              <div className="flex gap-6">
-                <ThumbBox
-                  preview={thumbPersegi}
-                  label="1080 x 1080"
-                  aspectClass="aspect-square"
-                  onClick={() => inputPersegiRef.current?.click()}
-                />
-                <input
-                  ref={inputPersegiRef}
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={(e) => handleThumb(e, setThumbPersegi, setThumbPersegiFile)}
-                />
-
-                <ThumbBox
-                  preview={thumbVertikal}
-                  label="1080 x 1920"
-                  aspectClass="aspect-[9/16]"
-                  onClick={() => inputVertikalRef.current?.click()}
-                />
-                <input
-                  ref={inputVertikalRef}
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={(e) => handleThumb(e, setThumbVertikal, setThumbVertikalFile)}
-                />
-              </div>
-
-              {/* Keterangan */}
-              <div className="mt-3 space-y-0.5">
-                <p className="text-xs text-blue-400">
-                  · Ukuran gambar harus 1080x1080, 1080x1920. Besar file gambar harus kurang dari 500KB.
+              {/* Keterangan Format */}
+              <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/5 space-y-1">
+                <p className="text-xs text-gray-600 dark:text-slate-400">
+                  • Ukuran file gambar maksimal 2 MB per file. Format yang didukung: JPG, JPEG, PNG, dan WebP.
                 </p>
-                <p className="text-xs text-blue-400">
-                  · Hanya format JPG, JPEG, dan PNG yang diperbolehkan.
+                <p className="text-xs text-gray-600 dark:text-slate-400">
+                  • Pastikan gambar tidak melanggar hak cipta dan sesuai pedoman konten.
                 </p>
               </div>
             </div>
@@ -392,13 +507,13 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                             onClick={() => toggleSensitif(key)}
                             className={`mt-0.5 h-4 w-4 flex-shrink-0 rounded-full border-2 transition-all ${
                               sensitifChecked[key]
-                                ? "border-blue-400 bg-blue-400"
-                                : "border-slate-500 bg-transparent group-hover:border-slate-400"
+                                ? "border-blue-500 bg-blue-500"
+                                : "border-gray-400 dark:border-slate-500 bg-transparent group-hover:border-blue-500"
                             }`}
                           />
                           <span
                             onClick={() => toggleSensitif(key)}
-                            className="text-xs text-gray-600 dark:text-slate-300 leading-snug select-none"
+                            className="text-xs text-gray-700 dark:text-slate-300 leading-snug select-none"
                           >
                             {item}
                           </span>
@@ -420,13 +535,13 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                 onClick={() => setSetuju(!setuju)}
                 className={`h-4 w-4 flex-shrink-0 rounded-full border-2 transition-all ${
                   setuju
-                    ? "border-blue-400 bg-blue-400"
-                    : "border-slate-500 bg-transparent group-hover:border-slate-400"
+                    ? "border-blue-500 bg-blue-500"
+                    : "border-gray-400 dark:border-slate-500 bg-transparent group-hover:border-blue-500"
                 }`}
               />
               <span
                 onClick={() => setSetuju(!setuju)}
-                className="text-sm text-gray-600 dark:text-slate-300 select-none"
+                className="text-sm text-gray-700 dark:text-slate-300 select-none"
               >
                 Silakan lakukan penilaian mandiri untuk serialmu.
               </span>
@@ -448,7 +563,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
             type="button"
             disabled={!setuju || submitting}
             onClick={handleSubmit}
-            className="px-12 py-3 rounded-xl bg-slate-700 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold text-white transition-all active:scale-[0.98] min-w-[160px]"
+            className="px-12 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-gray-200 dark:disabled:bg-slate-800 disabled:text-gray-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed text-sm font-bold text-white transition-all active:scale-[0.98] min-w-[160px] shadow-lg shadow-blue-500/20"
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -501,27 +616,69 @@ function SelectField({
 
 // ─── Helper: kotak upload thumbnail ───────────────────────────
 function ThumbBox({
-  preview, label, aspectClass, onClick,
+  preview,
+  label,
+  boxClass,
+  onClick,
+  onRemove,
 }: {
-  preview: string | null; label: string; aspectClass: string; onClick: () => void;
+  preview: string | null;
+  label: string;
+  boxClass: string;
+  onClick: () => void;
+  onRemove?: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 ${aspectClass} max-w-[180px] rounded-xl border-2 border-dashed border-gray-300 dark:border-white/15 bg-gray-100 dark:bg-[#0D1526] hover:border-blue-500/50 transition-colors overflow-hidden flex flex-col items-center justify-center gap-2 group`}
+    <div
+      className={`relative ${boxClass} rounded-2xl border-2 border-dashed border-gray-300 dark:border-white/15 bg-gray-100 dark:bg-[#0D1526] hover:border-blue-500/60 transition-all overflow-hidden flex flex-col items-center justify-center group shadow-sm`}
     >
       {preview ? (
-        <img src={preview} alt="thumbnail preview" className="w-full h-full object-cover" />
-      ) : (
         <>
-          <Upload className="h-5 w-5 text-gray-400 dark:text-slate-600 group-hover:text-blue-400 transition-colors" />
-          <span className="text-xs text-gray-400 dark:text-slate-600 group-hover:text-gray-500 dark:group-hover:text-slate-400 transition-colors">{label}</span>
-          <span className="text-[10px] font-semibold text-blue-400/70 group-hover:text-blue-400 transition-colors">
-            Pilih File
-          </span>
+          <img src={preview} alt="Thumbnail preview" className="w-full h-full object-cover" />
+
+          {/* Hover overlay dengan tombol Ganti & Hapus */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+            <button
+              type="button"
+              onClick={onClick}
+              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5"
+            >
+              <Camera className="h-3.5 w-3.5" />
+              <span>Ganti Gambar</span>
+            </button>
+
+            {onRemove && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+                className="px-3 py-1 rounded-xl bg-rose-500/80 hover:bg-rose-600 text-white text-[11px] font-medium active:scale-95 transition-all flex items-center gap-1"
+              >
+                <Trash2 className="h-3 w-3" />
+                <span>Hapus</span>
+              </button>
+            )}
+          </div>
         </>
+      ) : (
+        <button
+          type="button"
+          onClick={onClick}
+          className="w-full h-full flex flex-col items-center justify-center p-4 gap-2 cursor-pointer focus:outline-none"
+        >
+          <div className="p-3 rounded-full bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 dark:text-blue-400 group-hover:scale-110 transition-transform">
+            <Upload className="h-5 w-5" />
+          </div>
+          <span className="text-xs font-bold text-gray-700 dark:text-slate-300 group-hover:text-blue-500 transition-colors">
+            Pilih Foto
+          </span>
+          <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">
+            {label}
+          </span>
+        </button>
       )}
-    </button>
+    </div>
   );
 }
