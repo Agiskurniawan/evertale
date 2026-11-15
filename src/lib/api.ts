@@ -36,7 +36,8 @@ const PLACEHOLDER =
 // "/uploads/covers/x.jpg" → "http://localhost:5000/uploads/covers/x.jpg"
 export function assetUrl(path?: string | null): string {
   if (!path) return PLACEHOLDER;
-  return /^https?:|^data:/.test(path) ? path : `${API_ORIGIN}${path}`;
+  if (/^https?:|^data:/.test(path)) return path;
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
 // Ambil pesan error dari backend untuk ditampilkan ke user
