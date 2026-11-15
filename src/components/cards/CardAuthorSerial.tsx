@@ -10,17 +10,28 @@ export default function CardAuthorSerial({ serial }: CardAuthorSerialProps) {
   return (
     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 shadow-sm dark:bg-[#101726] dark:border-white/10 dark:hover:border-white/20 transition-all w-full">
       {/* Cover Buku */}
-      <img
-        src={assetUrl(serial.cover)}
-        alt={serial.title}
-        className="h-24 w-16 rounded-xl object-cover flex-shrink-0 border border-gray-200 dark:border-white/10"
-      />
+      <div className="relative h-24 w-16 flex-shrink-0">
+        <img
+          src={assetUrl(serial.cover)}
+          alt={serial.title}
+          className="h-full w-full rounded-xl object-cover border border-gray-200 dark:border-white/10"
+        />
+        <span
+          className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-sm ${
+            serial.type === "komik" ? "bg-[#FF4D6D]" : "bg-blue-600"
+          }`}
+        >
+          {serial.type === "komik" ? "KOMIK" : "NOVEL"}
+        </span>
+      </div>
 
       {/* Info Serial */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 truncate">
-          {serial.title}
-        </h3>
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
+            {serial.title}
+          </h3>
+        </div>
         <p className="text-xs text-blue-600 dark:text-blue-400 mb-0.5 font-medium">
           Ep. Tulis {serial.episodes} · Draft {serial.drafts} · Update {serial.updated} · {serial.status}
         </p>
@@ -48,10 +59,14 @@ export default function CardAuthorSerial({ serial }: CardAuthorSerialProps) {
           Kelola Serial
         </Link>
         <Link
-          to={`/author/tulis?serial=${serial.id}`}
+          to={
+            serial.type === "novel"
+              ? `/author/novel-editor?serial=${serial.id}`
+              : `/author/tulis?serial=${serial.id}`
+          }
           className="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:border-blue-500/20 px-3 py-1.5 rounded-lg transition-colors text-center"
         >
-          Kelola Episode
+          {serial.type === "novel" ? "Kelola Bab" : "Kelola Episode"}
         </Link>
       </div>
     </div>

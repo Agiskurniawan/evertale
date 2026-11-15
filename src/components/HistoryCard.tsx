@@ -6,12 +6,21 @@ export default function HistoryCard({ item }: { item: HistoryItem }) {
   return (
     <Link to={`/baca/${item.id}`} className="flex flex-row rounded-xl bg-white border border-gray-200 p-4 sm:p-5 gap-4 sm:gap-6 transition-all hover:border-gray-300 hover:shadow-md dark:bg-[#111A2C] dark:border-white/5 dark:hover:border-white/20">
       
-      <div className="w-20 h-28 sm:w-24 sm:h-32 shrink-0 overflow-hidden rounded-md">
+      <div className="relative w-20 h-28 sm:w-24 sm:h-32 shrink-0 overflow-hidden rounded-md">
         <img 
           src={assetUrl(item.cover)} 
           alt={item.title} 
           className="h-full w-full object-cover" 
         />
+        {item.type && (
+          <span
+            className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-sm ${
+              item.type === "komik" ? "bg-[#FF4D6D]" : "bg-blue-600"
+            }`}
+          >
+            {item.type === "komik" ? "KOMIK" : "NOVEL"}
+          </span>
+        )}
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col justify-between">

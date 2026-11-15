@@ -5,7 +5,7 @@ import BookCard from "../components/BookCard";
 import DataState from "../components/DataState";
 import { useAuth } from "../context/AuthContext";
 import { useFetch } from "../hooks/useFetch";
-import { api } from "../lib/api";
+import { api, assetUrl } from "../lib/api";
 import type { Book, Kreator } from "../types";
 
 type Tab = "akun" | "kreator";
@@ -45,10 +45,10 @@ export default function Favorit() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
+    <div className="min-h-[calc(100vh-72px)] bg-[#DFE3E8] dark:bg-[#0B1220] transition-colors duration-300">
 
       {/* ── Tab bar ── */}
-      <div className="border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#0B1220] sticky top-[72px] z-10">
+      <div className="border-b border-gray-300 dark:border-white/10 bg-[#ECEFF2] dark:bg-[#0B1220] sticky top-[72px] z-10 transition-colors duration-300">
         <div className="flex gap-0 px-4 md:px-12 lg:px-16">
           {tabs.map((t) => (
             <button
@@ -116,26 +116,33 @@ export default function Favorit() {
                   {favKreator.map((k) => (
                     <div
                       key={k.id}
-                      className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 hover:border-blue-500/30 hover:bg-gray-50 dark:hover:bg-[#121d30] transition-all duration-200 group"
+                      className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-[#ECEFF2] dark:bg-[#101726] border border-gray-300 dark:border-white/10 hover:border-blue-500/30 hover:bg-[#E5E9EE] dark:hover:bg-[#121d30] transition-all duration-200 group"
                     >
                       {/* Avatar */}
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-600/30 border border-blue-500/30 flex items-center justify-center flex-shrink-0 group-hover:border-blue-500/60 transition-colors">
-                        <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
-                      </div>
+                      <Link
+                        to={`/kreator/${k.id}`}
+                        className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-600/30 border border-blue-500/30 flex items-center justify-center flex-shrink-0 group-hover:border-blue-500/60 transition-colors overflow-hidden"
+                      >
+                        {k.avatar ? (
+                          <img src={assetUrl(k.avatar)} alt={k.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                        )}
+                      </Link>
 
                       {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-300 transition-colors">{k.name}</p>
+                      <Link to={`/kreator/${k.id}`} className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">{k.name}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">{k.genre}</p>
                         <p className="text-xs text-gray-400 dark:text-slate-600 mt-0.5">{k.works} karya · {k.followers} pengikut</p>
-                      </div>
+                      </Link>
 
-                      {/* Tombol Lihat */}
+                      {/* Tombol Lihat Profil & Karya */}
                       <Link
-                        to={`/author`}
-                        className="flex-shrink-0 text-xs font-semibold text-blue-500 dark:text-blue-400 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-500/50 px-4 py-2 rounded-xl transition-all duration-200 active:scale-95"
+                        to={`/kreator/${k.id}`}
+                        className="flex-shrink-0 text-xs font-semibold text-blue-600 dark:text-blue-400 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-500/50 px-4 py-2 rounded-xl transition-all duration-200 active:scale-95"
                       >
-                        Lihat
+                        Lihat Profil
                       </Link>
                     </div>
                   ))}

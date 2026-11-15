@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Camera, User, Info, Trash2, Loader2, Check } from "lucide-react";
+import { useNavigate, Navigate } from "react-router-dom";
+import { ArrowLeft, Camera, User, Trash2, Loader2, Check } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { api, assetUrl, errorMessage } from "../lib/api";
 
@@ -14,13 +14,13 @@ export default function EditProfil() {
   const [toastMsg, setToastMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [draftName, setDraftName] = useState(username);
+  const [draftName, setDraftName] = useState(username || "");
   const [draftBio, setDraftBio] = useState(bio || "");
 
   // Sinkronkan data awal ketika user sudah dimuat
   useEffect(() => {
-    setDraftName(username);
-    setDraftBio(bio || "");
+    if (username) setDraftName(username);
+    if (bio) setDraftBio(bio);
   }, [username, bio]);
 
   const showToast = (msg: string) => {
@@ -41,7 +41,7 @@ export default function EditProfil() {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      alert("Ukuran gambar maksimal 2 MB");
+      alert("Ukuran gambar maksimal 2 MB.");
       return;
     }
 
@@ -108,7 +108,7 @@ export default function EditProfil() {
       showToast("Profil berhasil disimpan!");
       setTimeout(() => {
         navigate("/profil");
-      }, 800);
+      }, 700);
     } catch (err) {
       setErrorMsg(errorMessage(err, "Gagal menyimpan perubahan profil"));
     } finally {
@@ -120,227 +120,216 @@ export default function EditProfil() {
   const quickBioSuggestions = [
     "Pencinta novel fantasi & aksi ⚔️",
     "Sedang menulis kisah baru ✨",
-    "Hanya membaca santai di waktu luang ☕",
+    "Membaca santai di waktu luang ☕",
     "Penggemar komik & manhwa 🎨",
     "Suka cerita misteri & romansa 📖",
   ];
 
   return (
-    <div className="min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220] px-4 py-8 md:px-12 lg:px-16">
-      {/* Toast Notifikasi Sukses */}
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-[#DFE3E8] dark:bg-[#0B1220] px-4 py-8 overflow-hidden transition-colors duration-300">
+      {/* ── Ornamen Lingkaran Sudut (Identik dengan Login & Daftar Author) ── */}
+      <div className="absolute -top-16 -left-16 w-44 h-44 rounded-full bg-blue-500/10 dark:bg-blue-600/10 pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full bg-indigo-500/10 dark:bg-indigo-600/10 pointer-events-none" />
+
+      {/* ── Tombol Kembali di Pojok Kiri Atas ── */}
+      <button
+        type="button"
+        onClick={() => navigate("/profil")}
+        className="absolute top-6 left-6 z-20 p-2.5 rounded-full bg-[#ECEFF2] dark:bg-white/10 text-gray-700 dark:text-white border border-gray-300 dark:border-white/10 hover:bg-white dark:hover:bg-white/20 transition-all shadow-sm active:scale-95"
+        title="Kembali ke Profil"
+        aria-label="Kembali ke Profil"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
+
+      {/* ── Toast Notifikasi ── */}
       {toastMsg && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-500/25 animate-fade-in">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-500/25 animate-fade-in">
           <Check className="h-4 w-4" />
           <span>{toastMsg}</span>
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto">
-        {/* Navigasi Kembali */}
-        <Link
-          to="/profil"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white transition-colors mb-4 group"
-        >
-          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Kembali ke Profil</span>
-        </Link>
+      {/* ── Card Utama Edit Profil (Pure Card) ── */}
+      <div className="w-full max-w-[460px] bg-[#ECEFF2] dark:bg-[#111A2C] rounded-3xl p-7 sm:p-9 shadow-2xl border border-gray-300 dark:border-white/10 relative z-10 transition-colors duration-300">
+        {/* Header Kartu */}
+        <div className="flex flex-col items-center mb-6 text-center">
+          <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+            Edit <span className="text-blue-600 dark:text-blue-400">Profil</span>
+          </h1>
+          <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
+            Perbarui foto, nama tampilan, dan bio akunmu
+          </p>
+        </div>
 
-        {/* Judul Halaman */}
-        <p className="text-sm text-blue-500 dark:text-blue-400 font-semibold tracking-wide uppercase mb-1">Pengaturan Akun</p>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Edit Profil</h1>
-        <p className="text-sm text-gray-600 dark:text-slate-400 mb-8">
-          Ubah foto profil, nama tampilan, dan bio Anda di EverTale.
-        </p>
-
-        {/* Card Utama */}
-        <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#101726] p-6 md:p-8 shadow-xl">
-          {/* Section Foto Profil Lingkaran */}
-          <div className="flex flex-col items-center justify-center pb-8 border-b border-gray-100 dark:border-white/10">
-            <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-4">Foto Profil</p>
-
-            <div className="relative group">
-              {/* Lingkaran Profil */}
-              <button
-                type="button"
-                onClick={triggerFileInput}
-                disabled={uploading}
-                aria-label="Ganti foto profil"
-                className="relative h-32 w-32 md:h-36 md:w-36 rounded-full border-2 border-blue-500/30 flex items-center justify-center overflow-hidden bg-blue-500/10 hover:border-blue-400 shadow-xl shadow-blue-500/10 active:scale-95 transition-all cursor-pointer group"
-              >
-                {avatarUrl ? (
-                  <img
-                    src={assetUrl(avatarUrl)}
-                    alt={username}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <User className="h-16 w-16 text-blue-500 dark:text-blue-400 group-hover:opacity-60 transition-opacity" />
-                )}
-
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-white transition-opacity">
-                  <Camera className="h-6 w-6 text-blue-300" />
-                  <span className="text-[11px] font-medium text-slate-200">Ganti Foto</span>
-                </div>
-
-                {/* Uploading Overlay */}
-                {uploading && (
-                  <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-2 z-10">
-                    <Loader2 className="h-7 w-7 text-blue-400 animate-spin" />
-                    <span className="text-xs text-white font-medium">Mengunggah...</span>
-                  </div>
-                )}
-              </button>
-
-              {/* Lencana Kamera Bulat */}
-              <button
-                type="button"
-                onClick={triggerFileInput}
-                disabled={uploading}
-                aria-label="Pilih foto"
-                className="absolute bottom-1 right-1 h-10 w-10 md:h-11 md:w-11 rounded-full bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center shadow-lg shadow-black/40 border-2 border-white dark:border-[#101726] active:scale-90 transition-all cursor-pointer"
-              >
-                <Camera className="h-5 w-5" />
-              </button>
-
-              {/* Input file tersembunyi */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                accept="image/png,image/jpeg,image/webp,image/jpg"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-            </div>
-
-            {/* Opsi hapus foto jika ada */}
-            <div className="mt-4 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={triggerFileInput}
-                disabled={uploading}
-                className="text-xs font-medium text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
-              >
-                Unggah Foto Baru
-              </button>
-              {avatarUrl && (
-                <>
-                  <span className="text-gray-300 dark:text-slate-600">·</span>
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    disabled={uploading}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span>Hapus Foto</span>
-                  </button>
-                </>
+        {/* Lingkaran Avatar */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative group">
+            <button
+              type="button"
+              onClick={triggerFileInput}
+              disabled={uploading}
+              className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-full border-2 border-blue-500 flex items-center justify-center overflow-hidden bg-blue-500/10 hover:border-blue-400 shadow-xl shadow-blue-500/15 active:scale-95 transition-all cursor-pointer"
+              title="Tekan untuk mengganti foto profil"
+            >
+              {avatarUrl ? (
+                <img
+                  src={assetUrl(avatarUrl)}
+                  alt={username}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User className="h-12 w-12 sm:h-14 sm:w-14 text-blue-500 dark:text-blue-400" />
               )}
-            </div>
-            <p className="text-[11px] text-gray-500 dark:text-slate-500 mt-1">
-              JPG, PNG, atau WebP (maksimal 2 MB)
-            </p>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-white transition-opacity">
+                <Camera className="h-5 w-5 text-blue-300" />
+                <span className="text-[10px] font-semibold text-slate-200">Ganti Foto</span>
+              </div>
+
+              {/* Uploading Spinner */}
+              {uploading && (
+                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-1.5 z-10">
+                  <Loader2 className="h-6 w-6 text-blue-400 animate-spin" />
+                  <span className="text-[10px] text-white font-medium">Mengunggah...</span>
+                </div>
+              )}
+            </button>
+
+            {/* Tombol Kamera di Pojok Lingkaran */}
+            <button
+              type="button"
+              onClick={triggerFileInput}
+              disabled={uploading}
+              className="absolute bottom-0 right-0 h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-black/40 border-2 border-[#ECEFF2] dark:border-[#111A2C] active:scale-90 transition-all cursor-pointer"
+              title="Pilih foto dari perangkat"
+            >
+              <Camera className="h-4 w-4" />
+            </button>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/png,image/jpeg,image/webp,image/jpg"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
           </div>
 
-          {/* Form Nama & Bio */}
-          <form onSubmit={handleSubmit} className="pt-6 flex flex-col gap-6">
-            {/* Pesan Error */}
-            {errorMsg && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-xs text-red-400">
-                {errorMsg}
-              </div>
-            )}
-
-            {/* 1. Nama */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                  <User className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                  <span>Nama</span>
-                </label>
-                <span className="text-xs text-gray-500 dark:text-slate-500">{draftName.length}/30</span>
-              </div>
-              <input
-                type="text"
-                value={draftName}
-                onChange={(e) => {
-                  setDraftName(e.target.value);
-                  if (errorMsg) setErrorMsg("");
-                }}
-                maxLength={30}
-                placeholder="Masukkan nama tampilan Anda..."
-                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
-              />
-              <p className="text-xs text-gray-500 dark:text-slate-500">
-                Nama ini akan terlihat oleh pembaca dan penulis lain di seluruh cerita dan komentar.
-              </p>
-            </div>
-
-            {/* 2. Bio */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                  <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                  <span>Bio (Tentang)</span>
-                </label>
-                <span className="text-xs text-gray-500 dark:text-slate-500">{draftBio.length}/120</span>
-              </div>
-              <textarea
-                value={draftBio}
-                onChange={(e) => {
-                  setDraftBio(e.target.value);
-                  if (errorMsg) setErrorMsg("");
-                }}
-                maxLength={120}
-                rows={3}
-                placeholder="Tuliskan sedikit tentang dirimu atau cerita favoritmu..."
-                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-              />
-
-              {/* Saran Cepat Bio */}
-              <div className="mt-1">
-                <p className="text-xs text-gray-500 dark:text-slate-500 mb-2">Pilih status cepat:</p>
-                <div className="flex flex-wrap gap-2">
-                  {quickBioSuggestions.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => setDraftBio(suggestion)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-all text-left ${
-                        draftBio === suggestion
-                          ? "bg-blue-500/20 border-blue-500 text-blue-600 dark:text-blue-300 font-medium"
-                          : "border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white"
-                      }`}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Tombol Aksi */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => navigate("/profil")}
-                disabled={saving}
-                className="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-semibold text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                disabled={saving || uploading}
-                className="px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 active:scale-98 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                <span>{saving ? "Menyimpan..." : "Simpan Perubahan"}</span>
-              </button>
-            </div>
-          </form>
+          {avatarUrl && (
+            <button
+              type="button"
+              onClick={handleRemoveAvatar}
+              disabled={uploading}
+              className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-medium text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors"
+            >
+              <Trash2 className="h-3 w-3" />
+              <span>Hapus foto profil</span>
+            </button>
+          )}
         </div>
+
+        {/* Pesan Error */}
+        {errorMsg && (
+          <div className="mb-4 rounded-2xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-xs text-red-500 dark:text-red-400">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Form Edit */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Input Nama Tampilan */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between ml-1">
+              <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
+                Nama Tampilan <span className="text-rose-500">*</span>
+              </label>
+              <span className="text-[10px] text-gray-500 dark:text-slate-500">
+                {draftName.length}/30
+              </span>
+            </div>
+            <input
+              type="text"
+              required
+              value={draftName}
+              onChange={(e) => {
+                setDraftName(e.target.value);
+                if (errorMsg) setErrorMsg("");
+              }}
+              placeholder="Masukkan nama tampilan kamu"
+              maxLength={30}
+              className="w-full bg-[#DEE3E8] dark:bg-[#0B1220] border border-gray-300 dark:border-white/10 rounded-2xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
+            />
+          </div>
+
+          {/* Input Bio / Tentang */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between ml-1">
+              <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
+                Bio / Tentang Kamu
+              </label>
+              <span className="text-[10px] text-gray-500 dark:text-slate-500">
+                {draftBio.length}/120
+              </span>
+            </div>
+            <textarea
+              rows={3}
+              value={draftBio}
+              onChange={(e) => {
+                setDraftBio(e.target.value);
+                if (errorMsg) setErrorMsg("");
+              }}
+              placeholder="Tulis sedikit tentang dirimu atau karya favoritmu..."
+              maxLength={120}
+              className="w-full bg-[#DEE3E8] dark:bg-[#0B1220] border border-gray-300 dark:border-white/10 rounded-2xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium resize-none"
+            />
+
+            {/* Pilihan Cepat Status Bio */}
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {quickBioSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => setDraftBio(suggestion)}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all text-left ${
+                    draftBio === suggestion
+                      ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                      : "bg-[#DEE3E8] dark:bg-[#0B1220] text-gray-700 dark:text-slate-300 border-gray-300 dark:border-white/10 hover:border-blue-400"
+                  }`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tombol Simpan */}
+          <button
+            type="submit"
+            disabled={saving || uploading}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : (
+              <span>Simpan Perubahan</span>
+            )}
+          </button>
+
+          {/* Tombol Batal / Kembali */}
+          <button
+            type="button"
+            onClick={() => navigate("/profil")}
+            disabled={saving}
+            className="text-center text-xs font-semibold text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors py-1"
+          >
+            Batal dan Kembali ke Profil
+          </button>
+        </form>
       </div>
     </div>
   );

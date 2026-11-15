@@ -67,8 +67,15 @@ export default function ModalPreviewEpisode({
           )}
 
           {novelContent && (
-            <div className="max-w-xl w-full py-6 text-gray-800 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
-              {novelContent}
+            <div className="max-w-xl w-full py-8 px-4 sm:px-6 bg-white dark:bg-[#101726] rounded-2xl shadow-sm border border-gray-200 dark:border-white/5 my-4 text-gray-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed font-serif selection:bg-blue-500 selection:text-white space-y-4">
+              {/<[a-z][\s\S]*>/i.test(novelContent) ? (
+                <div
+                  className="novel-content space-y-4"
+                  dangerouslySetInnerHTML={{ __html: novelContent }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap">{novelContent}</div>
+              )}
             </div>
           )}
 

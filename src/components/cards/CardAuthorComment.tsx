@@ -94,7 +94,7 @@ export default function CardAuthorComment({
         </div>
 
         {/* Tombol Aksi */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             type="button"
             onClick={() => setIsReplying((prev) => !prev)}
@@ -104,13 +104,15 @@ export default function CardAuthorComment({
             <span>Balas</span>
           </button>
 
+          {/* Tombol Blokir — tampil jelas dengan label */}
           <button
             type="button"
             onClick={() => onBlock(comment.user)}
-            title="Blokir pengguna ini"
-            className="p-1.5 rounded-lg bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-500 dark:bg-white/5 dark:hover:bg-red-500/15 dark:text-slate-400 dark:hover:text-red-400 transition-colors"
+            title={`Blokir @${comment.user.name}`}
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-500 dark:bg-white/5 dark:hover:bg-red-500/15 dark:text-slate-400 dark:hover:text-red-400 text-xs font-semibold transition-colors"
           >
-            <Ban className="h-4 w-4" />
+            <Ban className="h-3.5 w-3.5" />
+            <span>Blokir</span>
           </button>
 
           <button
