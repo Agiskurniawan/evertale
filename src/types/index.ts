@@ -52,6 +52,7 @@ export type HistoryItem = {
   id: number; // id karya (untuk link /baca/:id)
   chapter_id: number | null;
   title: string;
+  type?: BookType;
   cover: string | null;
   lastReadLabel: string;
   progress: number;
@@ -86,6 +87,7 @@ export type AuthorChapterRow = {
   id: number;
   no: number;
   title: string;
+  thumbnail_url?: string | null;
   words: string;
   date: string;
   status: "Terbit" | "Draft";
@@ -99,6 +101,7 @@ export type AuthorSerialDetail = {
   tags: string[];
   desc: string | null;
   cover: string | null;
+  banner: string | null;
   lang: string;
   category_ids: number[];
   update_day: string | null;
