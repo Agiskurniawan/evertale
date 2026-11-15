@@ -1,23 +1,11 @@
 import { useNavigate, Link, Navigate } from "react-router-dom";
 import { Crown, Settings, Heart, PenLine, LogOut, Camera, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { errorMessage, assetUrl } from "../lib/api";
+import { assetUrl } from "../lib/api";
 
 export default function Profil() {
-  const { user, username, bio, isAuthor, isLoggedIn, loading, logout, registerAsAuthor } = useAuth();
+  const { user, username, bio, isAuthor, isLoggedIn, loading, logout } = useAuth();
   const navigate = useNavigate();
-
-  // "Daftar Menjadi Author" → jadikan author di server dulu, baru buka dashboard
-  const handleAuthorClick = async (e: React.MouseEvent) => {
-    if (isAuthor) return;
-    e.preventDefault();
-    try {
-      await registerAsAuthor();
-      navigate("/author");
-    } catch (err) {
-      alert(errorMessage(err));
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -47,8 +35,7 @@ export default function Profil() {
       icon: <PenLine className="h-5 w-5 text-slate-400" />,
       label: isAuthor ? "Dashboard Author" : "Daftar Menjadi Author",
       sub: isAuthor ? "Kelola serial dan episode kamu" : "Mulai perjalananmu sebagai penulis",
-      to: "/author",
-      onClick: handleAuthorClick,
+      to: isAuthor ? "/author" : "/daftar-author",
     },
   ];
 
@@ -66,20 +53,28 @@ export default function Profil() {
         <div className="flex items-center gap-5 mb-8">
           <Link
             to="/profil/edit"
-            className="relative h-20 w-20 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center group flex-shrink-0 transition-all hover:border-blue-400 active:scale-95 overflow-hidden shadow-lg shadow-blue-500/10"
+            className="relative group flex-shrink-0 cursor-pointer"
             aria-label="Edit profil"
+            title="Tekan lingkaran untuk edit profil"
           >
-            {user?.avatar_url ? (
-              <img
-                src={assetUrl(user.avatar_url)}
-                alt={username}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <User className="h-9 w-9 text-blue-500 dark:text-blue-400 group-hover:opacity-60 transition-opacity" />
-            )}
-            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera className="h-5 w-5 text-white" />
+            <div className="relative h-20 w-20 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-400 group-active:scale-95 shadow-lg shadow-blue-500/15">
+              {user?.avatar_url ? (
+                <img
+                  src={assetUrl(user.avatar_url)}
+                  alt={username}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User className="h-9 w-9 text-blue-500 dark:text-blue-400 group-hover:opacity-60 transition-opacity" />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="h-5 w-5 text-white" />
+              </span>
+            </div>
+
+            {/* Lencana kamera kecil pada lingkaran */}
+            <span className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-blue-600 border-2 border-white dark:border-[#0B1220] text-white flex items-center justify-center shadow-md">
+              <Camera className="h-3 w-3" />
             </span>
           </Link>
 
@@ -108,7 +103,6 @@ export default function Profil() {
             <Link
               key={item.label}
               to={item.to}
-              onClick={item.onClick}
               className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
                 i < menuItems.length - 1 ? "border-b border-gray-100 dark:border-white/10" : ""
               }`}
