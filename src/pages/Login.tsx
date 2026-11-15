@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { errorMessage } from "../lib/api";
 
@@ -9,6 +9,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { login, register } = useAuth();
@@ -23,7 +24,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     if (!isLogin && password !== confirm) {
-      setError("Konfirmasi password tidak sama.");
+      setError("Konfirmasi kata sandi tidak cocok.");
       return;
     }
     setSubmitting(true);
@@ -39,143 +40,172 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center py-10 px-4 min-h-[calc(100vh-100px)]">
-      <div className="w-full max-w-[420px] bg-white dark:bg-[#101726] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/5 relative">
-        
-        {/* Top Gradient Background */}
-        <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-500/15 via-blue-500/5 to-transparent dark:from-blue-500/40 dark:via-blue-600/10 dark:to-transparent pointer-events-none" />
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-[#DFE3E8] dark:bg-[#0B1220] px-4 py-8 overflow-hidden transition-colors duration-300">
+      {/* ── Ornamen Lingkaran Sudut (Sesuai Konsep Gambar) ── */}
+      <div className="absolute -top-16 -left-16 w-44 h-44 rounded-full bg-blue-500/10 dark:bg-blue-600/10 pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full bg-indigo-500/10 dark:bg-indigo-600/10 pointer-events-none" />
 
-        <div className="relative z-10 p-8">
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className="bg-gray-100 dark:bg-white/10 p-1.5 rounded-lg flex items-center justify-center backdrop-blur-sm border border-gray-200 dark:border-white/10">
-                <BookOpen className="h-5 w-5 text-gray-900 dark:text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Ever<span className="text-blue-500 dark:text-blue-400">Tale</span>
-            </span>
+      {/* ── Tombol Kembali di Pojok Kiri Atas ── */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute top-6 left-6 z-20 p-2.5 rounded-full bg-[#ECEFF2] dark:bg-white/10 text-gray-700 dark:text-white border border-gray-300 dark:border-white/10 hover:bg-white dark:hover:bg-white/20 transition-all shadow-sm active:scale-95"
+        title="Kembali"
+        aria-label="Kembali"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
+
+      {/* ── Card Login Terpusat (Pure Card Sesuai Gambar Referensi) ── */}
+      <div className="w-full max-w-[440px] bg-[#ECEFF2] dark:bg-[#111A2C] rounded-3xl p-7 sm:p-9 shadow-2xl border border-gray-300 dark:border-white/10 relative z-10 transition-colors duration-300">
+        {/* Header Logo */}
+        <div className="flex flex-col items-center mb-6 text-center">
+          <div className="p-3 rounded-2xl bg-blue-500/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 mb-2 border border-blue-500/25 shadow-sm">
+            <BookOpen className="h-7 w-7" />
           </div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+            Ever<span className="text-blue-600 dark:text-blue-400">Tale</span>
+          </h1>
+          <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
+            {isLogin ? "Masuk ke akun membaca kamu" : "Daftar akun baru untuk mulai membaca"}
+          </p>
+        </div>
 
-          {/* Heading */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Selamat Datang</h1>
-            <p className="text-sm text-gray-600 dark:text-slate-400">EverTale - Dunia Cerita Dimulai di Sini</p>
-          </div>
+        {/* Toggle Mode: Login / Register */}
+        <div className="flex bg-[#D8DDE3] dark:bg-[#192235] rounded-2xl p-1 mb-6 border border-gray-300 dark:border-white/5">
+          <button
+            type="button"
+            onClick={() => switchMode(true)}
+            className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+              isLogin
+                ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
+            }`}
+          >
+            Masuk
+          </button>
+          <button
+            type="button"
+            onClick={() => switchMode(false)}
+            className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+              !isLogin
+                ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
+            }`}
+          >
+            Daftar
+          </button>
+        </div>
 
-          {/* Toggle Switch */}
-          <div className="flex bg-gray-100 dark:bg-[#192235] rounded-full p-1 mb-6 border border-gray-200 dark:border-white/5">
-            <button
-              onClick={() => switchMode(true)}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              Masuk
-            </button>
-            <button
-              onClick={() => switchMode(false)}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                !isLogin ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              Daftar
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Email</label>
+        {/* Formulir */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Email / Username */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-700 dark:text-slate-300 ml-1">
+              Email / Akun
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-slate-500" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                className="w-full pl-10 pr-4 py-3 bg-[#DEE3E8] dark:bg-[#0B1220] border border-gray-300 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
               />
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Password</label>
+          {/* Password */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-700 dark:text-slate-300 ml-1">
+              Kata Sandi
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-slate-500" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
-                className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                placeholder="••••••••"
+                className="w-full pl-10 pr-11 py-3 bg-[#DEE3E8] dark:bg-[#0B1220] border border-gray-300 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-500 hover:text-gray-800 dark:hover:text-white transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
+          </div>
 
-            {!isLogin && (
-              <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="text-xs font-semibold text-gray-700 dark:text-white ml-1">Konfirmasi Password</label>
+          {/* Konfirmasi Password (Saat Mode Daftar) */}
+          {!isLogin && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-gray-700 dark:text-slate-300 ml-1">
+                Ulangi Kata Sandi
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-slate-500" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  placeholder="Ulangi password"
-                  className="w-full bg-gray-50 dark:bg-[#0B1220] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-3 bg-[#DEE3E8] dark:bg-[#0B1220] border border-gray-300 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
                 />
               </div>
-            )}
+            </div>
+          )}
 
-            {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>}
+          {/* Lupa Password (saat mode login) */}
+          {isLogin && (
+            <div className="flex justify-end">
+              <span className="text-xs font-medium text-gray-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 cursor-pointer">
+                Lupa kata sandi?
+              </span>
+            </div>
+          )}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mt-2 w-full rounded-xl bg-blue-500 py-3.5 text-sm font-semibold text-white transition-all hover:bg-blue-400 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-60"
-            >
-              {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
-            </button>
-          </form>
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold text-center">
+              {error}
+            </div>
+          )}
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
-            <span className="text-xs text-gray-400 dark:text-slate-500 font-medium">atau</span>
-            <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
-          </div>
-
-          {/* Google Button */}
+          {/* Tombol Submit */}
           <button
-            type="button"
-            onClick={() => setError("Login dengan Google belum tersedia.")}
-            className="w-full rounded-xl bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 py-3 text-sm font-semibold text-gray-700 dark:text-white flex items-center justify-center gap-3 transition-colors hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.98]"
+            type="submit"
+            disabled={submitting}
+            className="mt-2 w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            {isLogin ? "Masuk dengan Google" : "Daftar dengan Google"}
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Memproses...</span>
+              </>
+            ) : (
+              <span>{isLogin ? "Masuk ke Akun" : "Daftar Akun Baru"}</span>
+            )}
           </button>
+        </form>
 
-          {/* Bottom text */}
-          <p className="mt-6 text-center text-sm text-gray-600 dark:text-slate-400">
+        {/* Bawah: Alternatif Switch */}
+        <div className="mt-6 pt-5 border-t border-gray-300/80 dark:border-white/10 text-center">
+          <p className="text-xs text-gray-600 dark:text-slate-400">
             {isLogin ? "Belum punya akun? " : "Sudah punya akun? "}
             <button
+              type="button"
               onClick={() => switchMode(!isLogin)}
-              className="text-gray-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 font-medium transition-colors"
+              className="font-bold text-blue-600 hover:text-blue-500 dark:text-blue-400 transition-colors"
             >
-              {isLogin ? "Daftar" : "Masuk"}
+              {isLogin ? "Daftar Sekarang" : "Masuk Sekarang"}
             </button>
           </p>
         </div>
