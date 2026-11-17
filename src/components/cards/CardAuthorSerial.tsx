@@ -8,57 +8,60 @@ interface CardAuthorSerialProps {
 
 export default function CardAuthorSerial({ serial }: CardAuthorSerialProps) {
   return (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 shadow-sm dark:bg-[#101726] dark:border-white/10 dark:hover:border-white/20 transition-all w-full">
-      {/* Cover Buku */}
-      <div className="relative h-24 w-16 flex-shrink-0">
-        <img
-          src={assetUrl(serial.cover)}
-          alt={serial.title}
-          onError={(e) => {
-            const img = e.currentTarget as HTMLImageElement;
-            img.src = assetUrl(null);
-          }}
-          className="h-full w-full rounded-xl object-cover border border-gray-200 dark:border-white/10"
-        />
-        <span
-          className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-sm ${
-            serial.type === "komik" ? "bg-[#FF4D6D]" : "bg-blue-600"
-          }`}
-        >
-          {serial.type === "komik" ? "KOMIK" : "NOVEL"}
-        </span>
-      </div>
-
-      {/* Info Serial */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
-            {serial.title}
-          </h3>
+    <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 shadow-sm dark:bg-[#101726] dark:border-white/10 dark:hover:border-white/20 transition-all w-full">
+      {/* Bagian Kiri / Utama: Cover + Info */}
+      <div className="flex items-start gap-3.5 sm:gap-4 flex-1 min-w-0 w-full">
+        {/* Cover Buku */}
+        <div className="relative h-24 w-16 flex-shrink-0">
+          <img
+            src={assetUrl(serial.cover)}
+            alt={serial.title}
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              img.src = assetUrl(null);
+            }}
+            className="h-full w-full rounded-xl object-cover border border-gray-200 dark:border-white/10"
+          />
+          <span
+            className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-sm ${
+              serial.type === "komik" ? "bg-[#FF4D6D]" : "bg-blue-600"
+            }`}
+          >
+            {serial.type === "komik" ? "KOMIK" : "NOVEL"}
+          </span>
         </div>
-        <p className="text-xs text-blue-600 dark:text-blue-400 mb-0.5 font-medium">
-          Ep. Tulis {serial.episodes} · Draft {serial.drafts} · Update {serial.updated} · {serial.status}
-        </p>
-        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{serial.lang}</p>
 
-        {/* Tag Genre */}
-        <div className="flex gap-1.5 flex-wrap">
-          {serial.tags.map((t) => (
-            <span
-              key={t}
-              className="text-xs text-gray-600 bg-gray-100 border border-gray-200 dark:text-gray-400 dark:bg-white/5 dark:border-white/10 px-2 py-0.5 rounded-full"
-            >
-              {t}
-            </span>
-          ))}
+        {/* Info Serial */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
+              {serial.title}
+            </h3>
+          </div>
+          <p className="text-xs text-blue-600 dark:text-blue-400 mb-0.5 font-medium leading-relaxed">
+            Ep. Tulis {serial.episodes} · Draft {serial.drafts} · Update {serial.updated} · {serial.status}
+          </p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{serial.lang}</p>
+
+          {/* Tag Genre */}
+          <div className="flex gap-1.5 flex-wrap">
+            {serial.tags.map((t) => (
+              <span
+                key={t}
+                className="text-xs text-gray-600 bg-gray-100 border border-gray-200 dark:text-gray-400 dark:bg-white/5 dark:border-white/10 px-2 py-0.5 rounded-full"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Tombol Aksi */}
-      <div className="flex flex-col gap-2 flex-shrink-0">
+      <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto flex-shrink-0 pt-2 sm:pt-0 border-t border-gray-100 dark:border-white/5 sm:border-0">
         <Link
           to={`/author/karya/${serial.id}`}
-          className="text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 dark:text-white dark:bg-white/10 dark:hover:bg-white/15 dark:border-white/10 px-3 py-1.5 rounded-lg transition-colors text-center"
+          className="flex-1 sm:flex-initial text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 dark:text-white dark:bg-white/10 dark:hover:bg-white/15 dark:border-white/10 px-3 py-2 sm:py-1.5 rounded-lg transition-colors text-center"
         >
           Kelola Serial
         </Link>
@@ -68,7 +71,7 @@ export default function CardAuthorSerial({ serial }: CardAuthorSerialProps) {
               ? `/author/novel-editor?serial=${serial.id}`
               : `/author/tulis?serial=${serial.id}`
           }
-          className="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:border-blue-500/20 px-3 py-1.5 rounded-lg transition-colors text-center"
+          className="flex-1 sm:flex-initial text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:border-blue-500/20 px-3 py-2 sm:py-1.5 rounded-lg transition-colors text-center"
         >
           {serial.type === "novel" ? "Kelola Bab" : "Kelola Episode"}
         </Link>

@@ -22,6 +22,7 @@ import {
   Loader2,
   X,
   Upload,
+  MoreVertical,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -87,6 +88,19 @@ export default function AuthorNovelEditor() {
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const [isUploadingThumb, setIsUploadingThumb] = useState<boolean>(false);
   const [showNoteField, setShowNoteField] = useState<boolean>(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState<boolean>(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Tutup menu dropdown mobile saat klik di luar
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+        setMobileMoreOpen(false);
+      }
+    }
+    if (mobileMoreOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mobileMoreOpen]);
 
   // Status format toolbar aktif (bold, italic, underline, alignment)
   const [activeFormats, setActiveFormats] = useState({
@@ -447,31 +461,53 @@ export default function AuthorNovelEditor() {
         </div>
       )}
 
-      {/* ── HEADER ATAS (Tipis, Bersih & Seimbang) ── */}
+      {/* ── HEADER ATAS (Responsif di HP, Tablet, & Desktop) ── */}
       {!isFocusMode && (
-        <header className="sticky top-0 z-30 h-14 flex items-center justify-between px-4 sm:px-8 bg-[#DFE3E8]/90 dark:bg-[#0B1220]/90 backdrop-blur-md border-b border-neutral-300/50 dark:border-white/[0.07]">
+        <header className="sticky top-0 z-30 min-h-14 py-2 px-3 sm:px-6 md:px-8 bg-[#DFE3E8]/95 dark:bg-[#0B1220]/95 backdrop-blur-md border-b border-neutral-300/50 dark:border-white/[0.07] flex items-center justify-between gap-2 transition-colors">
           {/* Sisi Kiri: Kembali & Info Novel */}
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
             <Link
               to={`/author/karya/${serialId || ""}`}
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+              className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors flex-shrink-0"
               title="Kembali ke Kelola Novel"
             >
               <ChevronLeft className="h-4 w-4" />
             </Link>
 
-            <div className="flex items-center gap-2 min-w-0 text-xs">
-              <span className="font-semibold text-neutral-600 dark:text-white truncate max-w-[140px] sm:max-w-[200px]">
+            <div className="flex items-center gap-1.5 min-w-0 text-xs">
+              <span className="font-semibold text-neutral-700 dark:text-white truncate max-w-[85px] xs:max-w-[125px] sm:max-w-[180px] md:max-w-[240px]">
                 {serial.data?.title || "Judul Novel"}
               </span>
-              <span className="text-neutral-300 dark:text-white/20">/</span>
-              <span className="text-neutral-800 dark:text-blue-400 font-semibold">
+              <span className="text-neutral-400 dark:text-white/20 flex-shrink-0">/</span>
+              <span className="text-neutral-900 dark:text-blue-400 font-bold flex-shrink-0 whitespace-nowrap">
                 Bab {chapterNumber}
               </span>
             </div>
+
+            {/* Indikator Status Autosave di Layar Ponsel */}
+            <div
+              className="flex items-center ml-0.5 md:hidden flex-shrink-0"
+              title={
+                saveStatus === "saving"
+                  ? "Menyimpan..."
+                  : saveStatus === "saved"
+                  ? `Tersimpan ${lastSavedTime ? `pukul ${lastSavedTime}` : ""}`
+                  : "Perubahan belum disimpan"
+              }
+            >
+              {saveStatus === "saving" && (
+                <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+              )}
+              {saveStatus === "saved" && (
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              )}
+              {saveStatus === "unsaved" && (
+                <span className="h-2 w-2 rounded-full bg-amber-500" />
+              )}
+            </div>
           </div>
 
-          {/* Sisi Tengah: Status Autosave Halus */}
+          {/* Sisi Tengah: Status Autosave Lengkap (Tablet & Desktop) */}
           <div className="hidden md:flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
             {saveStatus === "saving" && (
               <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 animate-pulse">
@@ -494,66 +530,156 @@ export default function AuthorNovelEditor() {
           </div>
 
           {/* Sisi Kanan: Kontrol & Tombol Aksi */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Riwayat Versi */}
-            <button
-              type="button"
-              onClick={() => setShowHistoryModal(true)}
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors relative"
-              title="Riwayat Versi Naskah"
-            >
-              <History className="h-4 w-4" />
-              {versionList.length > 0 && (
-                <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            {/* Tombol-tombol utilitas pada Layar Tablet & Desktop (sm ke atas) */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {/* Riwayat Versi */}
+              <button
+                type="button"
+                onClick={() => setShowHistoryModal(true)}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors relative"
+                title="Riwayat Versi Naskah"
+              >
+                <History className="h-4 w-4" />
+                {versionList.length > 0 && (
+                  <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                )}
+              </button>
+
+              {/* Mode Fokus */}
+              <button
+                type="button"
+                onClick={() => setIsFocusMode(true)}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                title="Mode Fokus (Layar Penuh)"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+
+              {/* Mode Gelap/Terang */}
+              <button
+                type="button"
+                onClick={toggleDarkMode}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                title={darkMode ? "Ganti ke Mode Terang" : "Ganti ke Mode Gelap"}
+              >
+                {darkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+              </button>
+
+              <div className="h-4 w-px bg-neutral-300 dark:bg-neutral-800 mx-0.5" />
+
+              {/* Pratinjau */}
+              <button
+                type="button"
+                onClick={() => setShowPreviewModal(true)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
+              >
+                <Eye className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-400" />
+                <span>Pratinjau</span>
+              </button>
+            </div>
+
+            {/* Menu Dropdown Opsi Tambahan untuk Mobile (sm:hidden) */}
+            <div className="relative sm:hidden" ref={moreMenuRef}>
+              <button
+                type="button"
+                onClick={() => setMobileMoreOpen((p) => !p)}
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
+                  mobileMoreOpen
+                    ? "bg-blue-500 text-white"
+                    : "text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                }`}
+                title="Menu Opsi Lainnya"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+
+              {mobileMoreOpen && (
+                <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-[#101726] border border-neutral-200 dark:border-white/10 rounded-xl shadow-2xl z-50 py-1.5 animate-in fade-in slide-in-from-top-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPreviewModal(true);
+                      setMobileMoreOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2.5 text-left text-xs font-medium text-neutral-700 dark:text-slate-200 hover:bg-neutral-100 dark:hover:bg-white/5 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Eye className="h-4 w-4 text-neutral-500" />
+                    <span>Pratinjau Bab</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowHistoryModal(true);
+                      setMobileMoreOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2.5 text-left text-xs font-medium text-neutral-700 dark:text-slate-200 hover:bg-neutral-100 dark:hover:bg-white/5 flex items-center justify-between transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <History className="h-4 w-4 text-neutral-500" />
+                      <span>Riwayat Versi</span>
+                    </div>
+                    {versionList.length > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500 text-white font-bold">
+                        {versionList.length}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsFocusMode(true);
+                      setMobileMoreOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2.5 text-left text-xs font-medium text-neutral-700 dark:text-slate-200 hover:bg-neutral-100 dark:hover:bg-white/5 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Maximize2 className="h-4 w-4 text-neutral-500" />
+                    <span>Mode Layar Penuh</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleDarkMode();
+                      setMobileMoreOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2.5 text-left text-xs font-medium text-neutral-700 dark:text-slate-200 hover:bg-neutral-100 dark:hover:bg-white/5 flex items-center gap-2.5 transition-colors"
+                  >
+                    {darkMode ? (
+                      <Sun className="h-4 w-4 text-amber-400" />
+                    ) : (
+                      <Moon className="h-4 w-4 text-neutral-500" />
+                    )}
+                    <span>{darkMode ? "Mode Terang" : "Mode Gelap"}</span>
+                  </button>
+
+                  <div className="my-1 border-t border-neutral-100 dark:border-white/5" />
+                  <div className="px-3.5 py-1.5 text-[11px] text-neutral-400 dark:text-slate-500">
+                    {saveStatus === "saving" && "Sedang menyimpan..."}
+                    {saveStatus === "saved" && `Tersimpan ${lastSavedTime ? `pk ${lastSavedTime}` : ""}`}
+                    {saveStatus === "unsaved" && "Belum disimpan"}
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
 
-            {/* Mode Fokus */}
-            <button
-              type="button"
-              onClick={() => setIsFocusMode(true)}
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors hidden sm:inline-flex"
-              title="Mode Fokus (Layar Penuh)"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </button>
-
-            {/* Mode Gelap/Terang */}
-            <button
-              type="button"
-              onClick={toggleDarkMode}
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
-              title={darkMode ? "Ganti ke Mode Terang" : "Ganti ke Mode Gelap"}
-            >
-              {darkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
-            </button>
-
-            <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800 mx-1 hidden sm:block" />
-
-            {/* Pratinjau */}
-            <button
-              type="button"
-              onClick={() => setShowPreviewModal(true)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
-            >
-              <Eye className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
-              <span className="hidden sm:inline">Pratinjau</span>
-            </button>
-
-            {/* Simpan Draft */}
+            {/* Simpan Draft (Selalu Tampak) */}
             <button
               type="button"
               onClick={() => handleSave(false)}
-              className="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-colors"
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 text-neutral-700 dark:text-neutral-300 text-xs font-semibold transition-colors active:scale-95 whitespace-nowrap"
             >
-              Simpan Draft
+              <span className="sm:hidden">Draft</span>
+              <span className="hidden sm:inline">Simpan Draft</span>
             </button>
 
-            {/* Terbitkan (Tombol Utama yang Menonjol) */}
+            {/* Terbitkan (Tombol Utama) */}
             <button
               type="button"
               onClick={() => handleSave(true)}
-              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition-colors"
+              className="px-3 sm:px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-xs transition-colors active:scale-95 whitespace-nowrap"
             >
               {isPublished ? "Perbarui" : "Terbitkan"}
             </button>

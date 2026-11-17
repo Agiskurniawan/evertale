@@ -166,13 +166,13 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
   ];
 
   return (
-    <div className="flex min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
 
       {/* ── Sidebar ── */}
       <AuthorSidebar activeTab="serial" />
 
       {/* ── Konten ── */}
-      <main className="flex-1 px-8 py-8 overflow-y-auto w-full">
+      <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8 overflow-y-auto w-full">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400 mb-6">
@@ -307,8 +307,8 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
 
         {/* ── Card: Thumbnail ── */}
         <section className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#101726] p-6 mb-5">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <div className="w-full md:w-36 flex-shrink-0">
+          <div className="flex flex-col lg:flex-row items-start gap-4 lg:gap-6">
+            <div className="w-full lg:w-36 flex-shrink-0">
               <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1">
                 Thumbnail
                 <span className="text-gray-400 dark:text-slate-500 font-normal text-xs" title="Cover serial yang tampil di beranda dan daftar karya">ⓘ</span>
@@ -318,9 +318,9 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
               </p>
             </div>
 
-            <div className="flex-1 w-full">
+            <div className="flex-1 w-full min-w-0">
               {/* Kolom Upload Thumbnail Bersebelahan & Rapi */}
-              <div className="flex flex-col sm:flex-row items-start gap-8">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start flex-wrap gap-6 sm:gap-8">
                 
                 {/* 1. Slot Thumbnail Persegi (1:1) */}
                 <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
@@ -335,7 +335,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                   <ThumbBox
                     preview={thumbPersegi}
                     label="1080 x 1080"
-                    boxClass="w-48 h-48 sm:w-52 sm:h-52 aspect-square"
+                    boxClass="w-44 h-44 sm:w-52 sm:h-52 aspect-square max-w-full"
                     onClick={() => inputPersegiRef.current?.click()}
                     onRemove={() => {
                       setThumbPersegi(null);
@@ -368,7 +368,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                   <ThumbBox
                     preview={thumbVertikal}
                     label="1080 x 1920"
-                    boxClass="w-48 h-64 sm:w-52 sm:h-72"
+                    boxClass="w-44 h-60 sm:w-52 sm:h-72 aspect-[9/16] max-w-full"
                     onClick={() => inputVertikalRef.current?.click()}
                     onRemove={() => {
                       setThumbVertikal(null);
@@ -401,7 +401,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                   <ThumbBox
                     preview={thumbHero}
                     label="1920 x 520 px (Ideal)"
-                    boxClass="w-64 h-36 sm:w-80 sm:h-44"
+                    boxClass="w-full max-w-[320px] sm:max-w-[360px] h-32 sm:h-44 aspect-[1920/520] max-w-full"
                     onClick={() => inputHeroRef.current?.click()}
                     onRemove={() => {
                       setThumbHero(null);
@@ -498,7 +498,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
                     {group.desc}
                   </p>
                   {/* Checkbox baris */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2.5">
                     {group.items.map((item) => {
                       const key = `${group.id}:${item}`;
                       return (
@@ -566,7 +566,7 @@ function BuatSerialForm({ categories }: { categories: Category[] }) {
             type="button"
             disabled={!setuju || submitting}
             onClick={handleSubmit}
-            className="px-12 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-gray-200 dark:disabled:bg-slate-800 disabled:text-gray-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed text-sm font-bold text-white transition-all active:scale-[0.98] min-w-[160px] shadow-lg shadow-blue-500/20"
+            className="w-full sm:w-auto px-12 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-gray-200 dark:disabled:bg-slate-800 disabled:text-gray-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed text-sm font-bold text-white transition-all active:scale-[0.98] min-w-[160px] shadow-lg shadow-blue-500/20"
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -593,9 +593,9 @@ function FormRow({
   label: string; children: React.ReactNode; alignTop?: boolean;
 }) {
   return (
-    <div className={`flex gap-6 py-4 border-b border-gray-100 dark:border-white/5 last:border-0 ${alignTop ? "items-start" : "items-center"}`}>
-      <span className="w-36 flex-shrink-0 text-sm font-semibold text-gray-700 dark:text-slate-200">{label}</span>
-      <div className="flex-1">{children}</div>
+    <div className={`flex flex-col sm:flex-row gap-2 sm:gap-6 py-4 border-b border-gray-100 dark:border-white/5 last:border-0 ${alignTop ? "sm:items-start" : "sm:items-center"}`}>
+      <span className="w-full sm:w-36 flex-shrink-0 text-sm font-semibold text-gray-700 dark:text-slate-200">{label}</span>
+      <div className="flex-1 w-full min-w-0">{children}</div>
     </div>
   );
 }

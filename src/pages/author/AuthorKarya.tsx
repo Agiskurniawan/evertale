@@ -77,12 +77,12 @@ export default function AuthorKarya() {
   if (loading || error || !serial) return <DataState loading={loading} error={error} />;
 
   return (
-    <div className="flex min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
       {/* Sidebar Reusable */}
       <AuthorSidebar activeTab="serial" />
 
       {/* Konten Form Edit / Kelola Serial (Full Width) */}
-      <main className="flex-1 px-4 py-8 md:px-10 lg:px-12 overflow-y-auto w-full">
+      <main className="flex-1 px-4 py-6 sm:px-8 lg:px-12 overflow-y-auto w-full">
         <EditSerialForm
           serial={serial}
           categories={categoriesData ?? []}
@@ -428,11 +428,11 @@ function EditSerialForm({
 
       <form onSubmit={handleSaveSerial} className="flex flex-col gap-6 w-full">
         {/* ─── KARTU 1: Status, Judul, Kategori ───────── */}
-        <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-6 flex flex-col gap-5 shadow-lg w-full">
+        <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-4 sm:p-6 flex flex-col gap-5 shadow-lg w-full">
           {/* Status Penerbitan */}
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
             <label className="text-sm font-bold text-gray-900 dark:text-white">Status Penerbitan</label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-3">
               <select
                 value={statusPenerbitan}
                 onChange={(e) =>
@@ -447,9 +447,9 @@ function EditSerialForm({
           </div>
 
           {/* Bahasa Sumber */}
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
             <label className="text-sm font-bold text-gray-900 dark:text-white">Bahasa Sumber</label>
-            <div className="md:col-span-3">
+            <div className="sm:col-span-3">
               <select
                 value={bahasaSumber}
                 onChange={(e) => setBahasaSumber(e.target.value)}
@@ -465,9 +465,9 @@ function EditSerialForm({
           </div>
 
           {/* Judul Serial */}
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
             <label className="text-sm font-bold text-gray-900 dark:text-white">Judul Serial</label>
-            <div className="md:col-span-3 relative">
+            <div className="sm:col-span-3 relative">
               <input
                 type="text"
                 maxLength={50}
@@ -483,9 +483,9 @@ function EditSerialForm({
           </div>
 
           {/* Ringkasan */}
-          <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 sm:gap-4">
             <label className="text-sm font-bold text-gray-900 dark:text-white pt-2">Ringkasan</label>
-            <div className="md:col-span-3 relative">
+            <div className="sm:col-span-3 relative">
               <textarea
                 rows={4}
                 maxLength={500}
@@ -501,9 +501,9 @@ function EditSerialForm({
           </div>
 
           {/* Kategori */}
-          <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
             <label className="text-sm font-bold text-gray-900 dark:text-white">Kategori</label>
-            <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <select
                 value={kategori1}
                 onChange={(e) => setKategori1(e.target.value)}
@@ -770,8 +770,8 @@ function EditSerialForm({
       </form>
 
       {/* ─── KARTU 4: Kelola Daftar Bab / Episode ─────────── */}
-      <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-6 flex flex-col gap-4 shadow-lg w-full mt-4">
-        <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-200 dark:border-white/10">
+      <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-4 sm:p-6 flex flex-col gap-4 shadow-lg w-full mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-white/10">
           <div>
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               {isNovel ? "Daftar Bab Novel" : "Daftar Episode Komik"}
@@ -792,7 +792,7 @@ function EditSerialForm({
                 ? `/author/novel-editor?serial=${serial.id}`
                 : `/author/tulis?serial=${serial.id}`
             }
-            className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-1.5"
+            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 active:scale-95 text-white text-xs font-semibold transition-all shadow-sm flex items-center justify-center gap-1.5"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{isNovel ? "Tambah Bab" : "Tambah Episode"}</span>

@@ -236,15 +236,15 @@ export default function KomentarContent({ onBack }: KomentarContentProps) {
         </div>
 
         {/* Body Komentar */}
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 flex flex-col justify-start">
           {commentsLoading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500 dark:text-slate-500 text-xs">
+            <div className="flex-1 flex flex-col items-center justify-center py-24 gap-3 text-gray-500 dark:text-slate-500 text-xs">
               <Loader2 className="h-6 w-6 animate-spin text-blue-500 dark:text-blue-400" />
               <span>Memuat komentar...</span>
             </div>
           ) : comments.length === 0 ? (
             /* Tampilan kosong */
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
+            <div className="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
               <div className="relative mb-5 w-44 h-32 flex items-center justify-center">
                 <div className="absolute top-0 left-4 w-20 h-16 rounded-2xl bg-emerald-500/90 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                   <div className="flex gap-1.5">
@@ -269,8 +269,8 @@ export default function KomentarContent({ onBack }: KomentarContentProps) {
               </p>
             </div>
           ) : (
-            /* Daftar komentar */
-            <div className="divide-y divide-gray-100 dark:divide-white/5">
+            /* Daftar komentar - mulai presisi dari atas */
+            <div className="divide-y divide-gray-100 dark:divide-white/5 w-full">
               {comments.map((comment) => (
                 <CardAuthorComment
                   key={comment.id}

@@ -63,9 +63,9 @@ export default function CardAuthorComment({
   });
 
   return (
-    <div className="p-5 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors flex flex-col gap-3">
+    <div className="p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors flex flex-col gap-3">
       {/* Baris User & Aksi */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-blue-500/10 border border-blue-500/30 dark:bg-blue-500/20 dark:border-blue-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
             {comment.user.avatar ? (
@@ -94,7 +94,7 @@ export default function CardAuthorComment({
         </div>
 
         {/* Tombol Aksi */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
           <button
             type="button"
             onClick={() => setIsReplying((prev) => !prev)}
@@ -127,13 +127,13 @@ export default function CardAuthorComment({
       </div>
 
       {/* Isi Komentar */}
-      <p className="text-sm text-gray-700 dark:text-slate-200 pl-13 leading-relaxed whitespace-pre-wrap">
+      <p className="text-sm text-gray-700 dark:text-slate-200 sm:pl-[52px] leading-relaxed whitespace-pre-wrap">
         {comment.content}
       </p>
 
       {/* Input Balasan Inline */}
       {isReplying && (
-        <div className="mt-2 pl-13 flex flex-col gap-2">
+        <div className="mt-2 sm:pl-[52px] flex flex-col gap-2">
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 dark:bg-[#0B1220] dark:border-white/10 rounded-xl p-2 focus-within:border-blue-500 transition-colors">
             <input
               type="text"

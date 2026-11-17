@@ -66,12 +66,12 @@ export default function AuthorTulis() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-72px)] bg-gray-50 dark:bg-[#0B1220]">
       {/* Sidebar Reusable */}
       <AuthorSidebar activeTab="serial" />
 
       {/* Konten Form Kelola Episode */}
-      <main className="flex-1 px-4 py-8 md:px-10 lg:px-14 overflow-y-auto w-full">
+      <main className="flex-1 px-4 py-6 sm:px-8 lg:px-14 overflow-y-auto w-full">
         <EpisodeEditor
           serial={serial.data}
           episode={episode.data}
@@ -310,11 +310,11 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
       )}
 
       {/* ─── KARTU 1: Informasi Dasar Serial & Episode ──────── */}
-      <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-6 flex flex-col gap-5 shadow-lg w-full">
+      <div className="rounded-2xl bg-white dark:bg-[#101726] border border-gray-200 dark:border-white/10 p-4 sm:p-6 flex flex-col gap-5 shadow-lg w-full">
         {/* Judul Serial */}
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-3">
           <label className="text-sm font-bold text-gray-900 dark:text-white">Judul Serial</label>
-          <div className="md:col-span-3">
+          <div className="sm:col-span-3">
             <input
               type="text"
               readOnly
@@ -325,7 +325,7 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
         </div>
 
         {/* Nomor Episode */}
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-3">
           <label className="flex items-center gap-1.5 text-sm font-bold text-gray-900 dark:text-white">
             <span>Nomor Episode</span>
             <span
@@ -335,7 +335,7 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
               <Info className="h-3.5 w-3.5" />
             </span>
           </label>
-          <div className="md:col-span-3">
+          <div className="sm:col-span-3">
             <input
               type="number"
               min={1}
@@ -347,9 +347,9 @@ function EpisodeEditor({ serial, episode, serialId }: EpisodeEditorProps) {
         </div>
 
         {/* Judul Episode */}
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-3">
           <label className="text-sm font-bold text-gray-900 dark:text-white">Judul Episode</label>
-          <div className="md:col-span-3 relative">
+          <div className="sm:col-span-3 relative">
             <input
               type="text"
               maxLength={60}
