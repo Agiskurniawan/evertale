@@ -12,9 +12,6 @@ import {
 import { api, assetUrl, errorMessage } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
-// Gambar komik contoh (gambar kapal layar berlayar malam hari yang diunggah pengguna)
-const SAMPLE_COMIC_PAGE = "/sample_comic_page.jpg";
-
 interface ChapterDetail {
   id: number;
   number: number;
@@ -299,16 +296,8 @@ export default function ComicReader({
                     />
                   ))
                 ) : (
-                  /* Fallback visual: contoh halaman komik sesuai referensi pengguna */
-                  <div className="w-full flex flex-col items-center">
-                    <img
-                      src={SAMPLE_COMIC_PAGE}
-                      alt="Pratinjau Komik"
-                      className="w-full h-auto block select-none shadow-xl"
-                    />
-                    <div className="p-4 text-center text-xs text-slate-500 bg-[#0A101D] w-full border-t border-white/5">
-                      <p>Halaman gambar komik dari kreator.</p>
-                    </div>
+                  <div className="w-full py-24 flex flex-col items-center justify-center text-slate-400 gap-2">
+                    <p className="text-sm font-medium">Belum ada halaman gambar komik yang diunggah untuk episode ini.</p>
                   </div>
                 )}
               </div>

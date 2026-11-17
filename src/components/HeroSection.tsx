@@ -5,10 +5,6 @@ import { useFetch } from "../hooks/useFetch";
 import { api, assetUrl } from "../lib/api";
 import type { Book, BookList } from "../types";
 
-// Gambar fallback: Hinata anime dengan anting bulan (sesuai screenshot asli)
-const SAMPLE_HERO_ART = "/sample_hero_art.jpg";
-const FALLBACK_COVER = "/uploads/covers/1794143446719-8bf6t7ldnx9.jpg";
-
 export default function HeroSection() {
   // Ambil hingga 10 karya trending untuk hero section yang bisa di-scroll / digeser
   const { data, loading } = useFetch(
@@ -92,28 +88,20 @@ export default function HeroSection() {
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((book, slideIdx) => {
-          const heroArt = book.banner
-            ? assetUrl(book.banner)
-            : book.cover
-            ? assetUrl(book.cover)
-            : assetUrl(SAMPLE_HERO_ART);
+          const heroArt = assetUrl(book.banner || book.cover);
 
           return (
             <div
               key={book.id || slideIdx}
               className="w-full h-full flex-shrink-0 relative overflow-hidden"
             >
-              {/* ── Gambar Penuh (Full-bleed cover) ── */}
+              {/* ── Gambar Penuh (Full-bleed cover dari Database) ── */}
               <img
                 src={heroArt}
                 alt={book.title}
                 onError={(e) => {
                   const img = e.currentTarget as HTMLImageElement;
-                  if (img.src !== assetUrl(SAMPLE_HERO_ART)) {
-                    img.src = assetUrl(SAMPLE_HERO_ART);
-                  } else {
-                    img.src = assetUrl(FALLBACK_COVER);
-                  }
+                  img.src = assetUrl(null);
                 }}
                 className="absolute inset-0 w-full h-full object-cover object-top"
               />

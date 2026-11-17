@@ -1,7 +1,29 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Smooth transition untuk pergantian tema */
 html {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Tipografi naskah novel (baca & tulis) */
+.font-novel {
+  font-family: 'Lora', Georgia, Cambria, 'Times New Roman', serif;
+}
+
+/* Seleksi teks lembut saat menulis */
+.novel-canvas::selection,
+.novel-canvas *::selection {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: inherit;
+}
+
+/* Placeholder hangat saat canvas kosong */
+.novel-canvas:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+.dark .novel-canvas:empty:before {
+  color: rgba(255, 255, 255, 0.45);
 }
